@@ -47,18 +47,19 @@ const route = app.use("*", cors({
         await setSignedCookie(c, "authCookie", username, COOKIE_SECRET, {
             httpOnly: true,
             secure: true,
-            sameSite: 'strict',
-            maxAge: 24 * 60 * 60
+            sameSite: 'none',
+            maxAge: 24 * 60 * 60,
+            path: '/'
         });
 
         return c.json(user);
     })
 .get('/api/v1/dashboard', async (c) => {
-    const username = getSignedCookie(c, COOKIE_SECRET, 'authCookie');
+    const username = await getSignedCookie(c, COOKIE_SECRET, 'authCookie');
     if (!username) {
         return c.json({"message": "Unauthorized"}, 401);
     }
-    return c.json({"message": `Welcome${username}`});
+    return c.json({"username": username});
 })
 
 serve({
