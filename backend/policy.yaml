@@ -1,0 +1,5 @@
+on_http_request:
+  - actions:
+      - type: forward-internal
+        config:
+          url: https://famous-wealthy-seal.ngrok-free.app.internal

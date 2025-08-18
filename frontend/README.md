@@ -1,6 +1,12 @@
 # Ethan Portfolio
 The website is located at https://ethansun.org
 
+## Quickstart
+```
+npm install
+npm run dev
+```
+
 ## Tech Stack
 - Vite
 - TypeScript
