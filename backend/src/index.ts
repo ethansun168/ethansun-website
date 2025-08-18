@@ -2,6 +2,8 @@ import dotenv from 'dotenv';
 import { serve } from '@hono/node-server';
 import { Hono } from 'hono';
 import { cors } from 'hono/cors';
+import { hashPassword, verifyPassword } from './auth.js';
+import { getUser } from './db.js';
 
 dotenv.config();
 const app = new Hono()
@@ -12,8 +14,23 @@ app.get('/', (c) => {
   return c.text('Hello Hono!')
 })
 
-app.get('/api', (c) => {
+app.get('/api/v1', (c) => {
     return c.json({"hello": "world"})
+})
+
+app.post('/api/v1/login', async (c) => {
+    const body = await c.req.json();
+    const username = body.username;
+    const password = body.password;
+    const user = await getUser(username);
+    if (!user) {
+        return c.json({"message": "Failed to get user"}, 400);
+    }
+    if (!await verifyPassword(password, user.password)) {
+        return c.json({"message": "Unauthorized"}, 401)
+    }
+
+    return c.json({username: username})
 })
 
 serve({
