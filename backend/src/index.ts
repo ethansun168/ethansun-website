@@ -1,16 +1,25 @@
 import { serve } from '@hono/node-server';
+import { zValidator } from '@hono/zod-validator';
 import dotenv from 'dotenv';
 import { Hono } from 'hono';
 import { cors } from 'hono/cors';
+import z from 'zod';
 import { verifyPassword } from './auth.js';
 import { getUser } from './db.js';
-import { zValidator } from '@hono/zod-validator';
-import z from 'zod';
-
+import { getSignedCookie, setSignedCookie } from 'hono/cookie';
 dotenv.config();
+
+const COOKIE_SECRET = process.env.COOKIE_SECRET;
+if (!COOKIE_SECRET) throw new Error("Cookie secret invalid");
+
 const app = new Hono()
 
-const route = app.use("*", cors())
+const route = app.use("*", cors({
+    origin: [ 'http://localhost:5173', 'https://ethansun.org'], // <- your frontend URL
+    allowMethods: ['GET', 'POST', 'OPTIONS'],
+    allowHeaders: ['Content-Type', 'ngrok-skip-browser-warning'],
+    credentials: true, // allow cookies
+}))
 .get('/', (c) => {
     return c.text('Hello Hono!')
 })
@@ -28,15 +37,29 @@ const route = app.use("*", cors())
     ), async (c) => {
         const {username, password} = c.req.valid('json');
         const user = await getUser(username);
-        console.log(user);
         if (!user) {
             return c.json({"message": "Failed to get user"}, 400);
         }
         if (!await verifyPassword(password, user.password)) {
             return c.json({"message": "Wrong password"}, 401)
         }
-        return c.json(user)
+
+        await setSignedCookie(c, "authCookie", username, COOKIE_SECRET, {
+            httpOnly: true,
+            secure: true,
+            sameSite: 'strict',
+            maxAge: 24 * 60 * 60
+        });
+
+        return c.json(user);
     })
+.get('/api/v1/dashboard', async (c) => {
+    const username = getSignedCookie(c, COOKIE_SECRET, 'authCookie');
+    if (!username) {
+        return c.json({"message": "Unauthorized"}, 401);
+    }
+    return c.json({"message": `Welcome${username}`});
+})
 
 serve({
   fetch: app.fetch,
