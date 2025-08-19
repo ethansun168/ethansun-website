@@ -46,20 +46,20 @@ export default function Navbar() {
           isLoading ? <Spinner/> :
           username ? 
             <DropdownMenu>
-              <DropdownMenuTrigger>
+              <DropdownMenuTrigger className="cursor-pointer">
                 <Avatar>
                   <AvatarImage src="/avatar.png" alt="User Avatar" />
                   <AvatarFallback>{username.charAt(0).toUpperCase()}</AvatarFallback>
                 </Avatar>
               </DropdownMenuTrigger>
               <DropdownMenuContent align="end">
-                <DropdownMenuItem onClick={() => navigate('/dashboard')}>Dashboard</DropdownMenuItem>
-                <DropdownMenuItem onClick={logout}>Logout</DropdownMenuItem>
+                <DropdownMenuItem className="cursor-pointer" onClick={() => navigate('/dashboard')}>Dashboard</DropdownMenuItem>
+                <DropdownMenuItem className="cursor-pointer" onClick={logout}>Logout</DropdownMenuItem>
               </DropdownMenuContent>
             </DropdownMenu> :
 
             <Link to="/login">
-              <Button variant="default">Login</Button>
+              <Button className="cursor-pointer" variant="default">Login</Button>
             </Link>
         }
 

@@ -102,7 +102,7 @@ export function Login() {
                 </p>
               ) : null
             }
-            <Button type="submit" className="w-full mt-4">
+            <Button type="submit" className="cursor-pointer w-full mt-4">
               Login
             </Button>
           </form>
