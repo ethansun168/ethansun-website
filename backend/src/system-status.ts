@@ -28,9 +28,6 @@ export async function getSystemStatus() {
     sshStatus = 'Online';
   } catch {}
 
-  console.log(osInfo.release);
-  console.log(osInfo.distro);
-
   return {
     uptime: secondsToHuman(os.uptime()),
     cpuUsage: `${cpuLoad.currentLoad.toFixed(2)}%`,
