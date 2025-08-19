@@ -23,24 +23,18 @@ const navLinks = [
 
 export default function Navbar() {
   const [hidden, setHidden] = useState(false);
-  const [lastScroll, setLastScroll] = useState(0);
 
   useEffect(() => {
     const handleScroll = () => {
-      const currentScroll = window.scrollY;
-      if (currentScroll > lastScroll && currentScroll > 50) {
-        // scrolling down
-        setHidden(true);
-      } else {
-        // scrolling up
+      if (window.scrollY === 0) {
         setHidden(false);
+      } else {
+        setHidden(true);
       }
-      setLastScroll(currentScroll);
     };
-
     window.addEventListener('scroll', handleScroll);
     return () => window.removeEventListener('scroll', handleScroll);
-  }, [lastScroll]);
+  }, []);
 
   const queryClient = useQueryClient();
   const navigate = useNavigate();
