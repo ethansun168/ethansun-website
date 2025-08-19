@@ -1,6 +1,7 @@
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { useUsername } from "@/hooks/query";
+import { Card, CardHeader, CardTitle, CardContent } from "@/components/ui/card"
 import { useMutation, useQueryClient } from "@tanstack/react-query";
 import { useEffect, useState } from "react";
 import { useNavigate } from "react-router-dom";
@@ -59,16 +60,15 @@ export function Login() {
   }
 
   return (
-    <div className="w-full bg-gray-50 shadow-md rounded-lg mx-auto flex flex-col 
-      min-h-[calc(100vh-5rem)] flex-col justify-center">
-
-      <div className="flex flex-1 items-center justify-center">
-        <div className="w-full max-w-md p-6 bg-white shadow-md rounded-lg">
-          <h2 className="text-2xl font-bold mb-4 text-center">Login</h2>
-
+    <div className="flex min-h-[calc(100vh-5rem)] items-center justify-center bg-gray-50 dark:bg-gray-900 p-4">
+      <Card className="w-full max-w-md">
+        <CardHeader>
+          <CardTitle className="text-2xl font-bold text-center">Login</CardTitle>
+        </CardHeader>
+        <CardContent>
           <form onSubmit={login} className="space-y-4">
-            <div>
-              <label className="block mb-1 font-medium" htmlFor="email">
+            <div className="space-y-2">
+              <label htmlFor="username" className="block text-sm font-medium">
                 Username
               </label>
               <Input
@@ -78,12 +78,12 @@ export function Login() {
                 value={username}
                 required
                 onChange={(e) => setUsername(e.target.value)}
-                className={`border p-2 rounded w-full ${error ? 'border-red-600' : 'border-gray-300'}`}
+                className={error ? "border-red-600" : ""}
               />
             </div>
 
-            <div>
-              <label className="block mb-1 font-medium" htmlFor="password">
+            <div className="space-y-2">
+              <label htmlFor="password" className="block text-sm font-medium">
                 Password
               </label>
               <Input
@@ -91,28 +91,34 @@ export function Login() {
                 type="password"
                 placeholder="Enter your password"
                 value={password}
-                required onChange={(e) => setPassword(e.target.value)}
-                className={`border p-2 rounded w-full ${error ? 'border-red-600' : 'border-gray-300'}`}
+                required
+                onChange={(e) => setPassword(e.target.value)}
+                className={error ? "border-red-600" : ""}
               />
             </div>
-            {
-              error ? (
-                <p className="mt-1 text-sm text-red-600">
-                  {error}
-                </p>
-              ) : null
-            }
-            <Button type="submit" className="cursor-pointer w-full mt-4">
+
+            {error && (
+              <p className="text-sm text-red-600">{error}</p>
+            )}
+
+            <Button type="submit" className="w-full">
               Login
             </Button>
           </form>
 
-          {/* Optional Sign Up Link */}
-          <p className="mt-4 text-center text-sm text-gray-600">
-            Don't have an account? <a href="https://www.youtube.com/watch?v=dQw4w9WgXcQ" className="text-blue-500 hover:underline" target="_blank">Too Bad</a>
+          <p className="mt-6 text-center text-sm text-muted-foreground">
+            Don&apos;t have an account?{" "}
+            <a
+              href="https://www.youtube.com/watch?v=dQw4w9WgXcQ"
+              target="_blank"
+              rel="noopener noreferrer"
+              className="text-blue-500 hover:underline"
+            >
+              Too Bad
+            </a>
           </p>
-        </div>
-      </div>
+        </CardContent>
+      </Card>
     </div>
-  );
-}
+  )
+};

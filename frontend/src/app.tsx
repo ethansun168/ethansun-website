@@ -2,6 +2,7 @@ import { Route, Routes } from 'react-router-dom';
 import { Dashboard } from './components/dashboard';
 import { Login } from './components/login';
 import Navbar from './components/navbar';
+import { ThemeProvider } from './components/theme-provider';
 
 function Home() {
   return <h1>Home page </h1>
@@ -17,7 +18,7 @@ function Contact() {
 
 function App() {
   return (
-    <>
+    <ThemeProvider defaultTheme='light' storageKey='vite-ui-theme'>
       <Navbar />
       <Routes>
         <Route path="/" element={<Home />} />
@@ -26,7 +27,7 @@ function App() {
         <Route path="/login" element={<Login />} />
         <Route path="/dashboard" element={<Dashboard />} />
       </Routes>
-    </>
+    </ThemeProvider>
   )
 }
 

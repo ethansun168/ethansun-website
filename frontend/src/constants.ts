@@ -1,5 +1,5 @@
-import { hc } from 'hono/client';
 import type { AppType } from 'ethansun-website-backend';
+import { hc } from 'hono/client';
 
 export const BACKEND_URL = "https://famous-wealthy-seal.ngrok-free.app";
 export const client = hc<AppType>(BACKEND_URL,
