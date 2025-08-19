@@ -28,8 +28,15 @@ systemctl status ngrok
 sudo ngrok service stop
 ```
 ## Deploying
+Set up environment variables in `.env`
+```
+COOKIE_SECRET=[cookie_secret]
+```
+
 Build and run the hono app
 ```
+# Create the database
+./bin/db create
 npm run build
 npm start
 ```

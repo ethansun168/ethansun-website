@@ -6,7 +6,7 @@ import minecraft, { injectWebSocket } from './minecraft.js';
 import { getSystemStatus } from './system-status.js';
 
 const app = new Hono().use("*", cors({
-  origin: [ 'http://localhost:5173', 'https://ethansun.org'],
+  origin: [ 'http://localhost:5173', 'http://localhost:4173', 'https://ethansun.org'],
   allowMethods: ['GET', 'POST', 'OPTIONS'],
   allowHeaders: ['Content-Type', 'ngrok-skip-browser-warning'],
   credentials: true,
