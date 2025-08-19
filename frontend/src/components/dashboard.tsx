@@ -61,9 +61,8 @@ export function Dashboard() {
             </div>
             <Progress
               value={parseInt(systemData.memoryUsage.split('(')[1])}
-              className="bg-green-100 [&>div]:bg-green-600"
+              className="bg-green-100 dark:bg-green-900 [&>div]:bg-green-600 dark:[&>div]:bg-green-400"
             />
-
           </CardContent>
         </Card>
 
@@ -78,9 +77,8 @@ export function Dashboard() {
             </div>
             <Progress
               value={parseInt(systemData.diskUsage.split('(')[1])}
-              className="bg-green-100 [&>div]:bg-green-600"
+              className="bg-green-100 dark:bg-green-900 [&>div]:bg-green-600 dark:[&>div]:bg-green-400"
             />
-
           </CardContent>
         </Card>
 

@@ -1,36 +1,41 @@
 import { Button } from "@/components/ui/button";
+import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { Input } from "@/components/ui/input";
 import { useUsername } from "@/hooks/query";
-import { Card, CardHeader, CardTitle, CardContent } from "@/components/ui/card"
 import { useMutation, useQueryClient } from "@tanstack/react-query";
 import { useEffect, useState } from "react";
 import { useNavigate } from "react-router-dom";
 import { client } from "../constants";
 
 export function Login() {
+  const queryClient = useQueryClient();
+  const navigate = useNavigate();
   const [username, setUsername] = useState("");
   const [password, setPassword] = useState(""); 
   const [error, setError] = useState("");
-  const navigate = useNavigate();
   const {data, isLoading} = useUsername();
-  const queryClient = useQueryClient();
 
   const {mutateAsync: loginRequest} = useMutation({
     mutationFn: async ({username, password}: {username: string, password: string}) => {
-      const response = await client.api.v1.login.$post({
-        json: {
-          username: username,
-          password: password,
-        },
-      })
-      if (!response.ok) {
-        const body = await response.json();
-        if ('message' in body) {
-          throw new Error(body.message);
+      try {
+        const response = await client.api.v1.login.$post({
+          json: {
+            username: username,
+            password: password,
+          },
+        })
+        if (!response.ok) {
+          const body = await response.json();
+          if ('message' in body) {
+            throw new Error(body.message);
+          }
+          throw new Error("Unknown error");
         }
-        throw new Error("Unknown error");
+        return await response.json();
       }
-      return await response.json();
+      catch {
+        throw new Error("Unable to connect to server");
+      }
     },
     onSuccess: (data) => {
       setError('');
