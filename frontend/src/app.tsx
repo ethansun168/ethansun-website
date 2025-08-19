@@ -1,52 +1,43 @@
-// import { useState } from 'react'
-// import { Button } from '@/components/ui/button';
-import { Login } from './login';
-import Navbar from './navbar';
+import { useEffect, useState } from 'react';
 import { Route, Routes } from 'react-router-dom';
-
-// <Button onClick={ async () => {
-//     const response = await fetch(`${BACKEND_URL}/api`,
-//         {
-//             headers: {
-//                 "Content-Type": "application/json", 
-//                 "ngrok-skip-browser-warning": "true",
-//             }
-//         }
-//     );
-//     const data = await response.json();
-//     console.log(data);
-// }}
-// > click me</Button>
-
-// const BACKEND_URL = "https://famous-wealthy-seal.ngrok-free.app";
+import { Dashboard } from './components/dashboard';
+import { Login } from './components/login';
+import Navbar from './components/navbar';
+import { useUsername } from './hooks/query';
 
 function Home() {
-    return <h1>Home page </h1>
+  return <h1>Home page </h1>
 }
 
 function About() {
-    return <h1>About page </h1>
+  return <h1>About page </h1>
 }
 
 function Contact() {
-    return <h1>Contact page </h1>
+  return <h1>Contact page </h1>
 }
 
 function App() {
-    
-    return (
-        <>
-            <Navbar />
-            <div className="pt-20">
-                <Routes>
-                    <Route path="/" element={<Home />} />
-                    <Route path="/about" element={<About />} />
-                    <Route path="/contact" element={<Contact />} />
-                    <Route path="/login" element={<Login />} />
-                </Routes>
-            </div>
-        </>
-    )
+  const [username, setUsername] = useState("");
+  const {data, isLoading} = useUsername();
+  useEffect(() => {
+    if(data) {
+      setUsername(data);
+    }
+  }, [data])
+
+  return (
+    <>
+      <Navbar username={username} setUsername={setUsername} isLoading={isLoading}/>
+      <Routes>
+        <Route path="/" element={<Home />} />
+        <Route path="/about" element={<About />} />
+        <Route path="/contact" element={<Contact />} />
+        <Route path="/login" element={<Login setUsername={setUsername}/>} />
+        <Route path="/dashboard" element={<Dashboard username={username} setUsername={setUsername}/>} />
+      </Routes>
+    </>
+  )
 }
 
 export default App
