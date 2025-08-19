@@ -6,7 +6,6 @@
     "verbatimModuleSyntax": true,
     "skipLibCheck": true,
     "declaration": true,
-    "emitDeclarationOnly": true,
     "composite": true,
     "declarationMap": true,
     "tsBuildInfoFile": "dist/.tsbuildinfo",

@@ -2,6 +2,7 @@ import { serve } from '@hono/node-server';
 import { Hono } from 'hono';
 import { cors } from 'hono/cors';
 import auth, { requireAuth } from './auth.js';
+import minecraft, { injectWebSocket } from './minecraft.js';
 import { getSystemStatus } from './system-status.js';
 
 const app = new Hono().use("*", cors({
@@ -21,13 +22,16 @@ const route = app.get('/', (c) => {
   const status = await getSystemStatus();
   return c.json(status);
 })
-.route('/', auth);
+.route('/', auth)
+.route('/', minecraft);
 
-serve({
+const server = serve({
   fetch: app.fetch,
   port: 3000
 }, (info) => {
     console.log(`Server is running on http://localhost:${info.port}`)
   })
+
+injectWebSocket(server);
 
 export type AppType = typeof route;
