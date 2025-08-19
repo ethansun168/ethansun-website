@@ -35,3 +35,4 @@ const server = serve({
 injectWebSocket(server);
 
 export type AppType = typeof route;
+export * from './minecraft.js';

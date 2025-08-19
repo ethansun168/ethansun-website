@@ -4,7 +4,7 @@ import { createNodeWebSocket } from "@hono/node-ws";
 const app = new Hono();
 export const { injectWebSocket, upgradeWebSocket } = createNodeWebSocket({ app });
 
-app.get('/status', (c) => c.json({status: "test"}))
+const wsApp = app.get('/status', (c) => c.json({status: "test"}))
   .get('/ws', upgradeWebSocket((c) => {
     return {
       onMessage(event, ws) {
@@ -17,5 +17,5 @@ app.get('/status', (c) => c.json({status: "test"}))
     }})
   );
 
-
+export type WebSocketApp = typeof wsApp;
 export default app;
