@@ -49,7 +49,7 @@ export default function Navbar() {
               <DropdownMenuTrigger>
                 <Avatar>
                   <AvatarImage src="/avatar.png" alt="User Avatar" />
-                  <AvatarFallback>U</AvatarFallback>
+                  <AvatarFallback>{username.charAt(0).toUpperCase()}</AvatarFallback>
                 </Avatar>
               </DropdownMenuTrigger>
               <DropdownMenuContent align="end">
