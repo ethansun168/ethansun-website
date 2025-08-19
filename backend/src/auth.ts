@@ -70,14 +70,14 @@ const app = new Hono()
   const username = c.get('username');
   return c.json({"username": username});
 })
-.get('/api/v1/logout', async(c) => {
+.get('/api/v1/logout', requireAuth, async(c) => {
   deleteCookie(c, AUTH_COOKIE_NAME, {
     httpOnly: true,
     secure: true,
     sameSite: 'none',
     path: '/'
   });
-  return c.json({"message": "success"})
+  return c.json({"message": "Logged out"})
 })
 
 export default app;
