@@ -37,9 +37,8 @@ export const requireAuth = createMiddleware<{
   await next();
 })
 
-const app = new Hono();
-
-app.post(
+const app = new Hono()
+.post(
   '/api/v1/login',
   zValidator(
     'json',

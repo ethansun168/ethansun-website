@@ -4,15 +4,14 @@ import { cors } from 'hono/cors';
 import auth, { requireAuth } from './auth.js';
 import { getSystemStatus } from './system-status.js';
 
-const app = new Hono()
-
-const route = app.use("*", cors({
+const app = new Hono().use("*", cors({
   origin: [ 'http://localhost:5173', 'https://ethansun.org'],
   allowMethods: ['GET', 'POST', 'OPTIONS'],
   allowHeaders: ['Content-Type', 'ngrok-skip-browser-warning'],
   credentials: true,
 }))
-.get('/', (c) => {
+
+const route = app.get('/', (c) => {
   return c.text('Hello Hono!')
 })
 .get('/api/v1', (c) => {
