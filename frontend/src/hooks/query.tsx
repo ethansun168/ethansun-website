@@ -14,6 +14,6 @@ export function useUsername() {
     },
     retry: false,
     refetchOnWindowFocus: false,
-    staleTime: Infinity
+    staleTime: 24 * 60 * 60
   })
 }

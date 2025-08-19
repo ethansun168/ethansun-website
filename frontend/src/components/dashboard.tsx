@@ -27,7 +27,7 @@ export function Dashboard() {
   if (!username || !systemData) return null;
 
   return (
-    <div className="min-h-screen bg-gray-50">
+    <div className="w-full">
       <h1 className="text-3xl font-bold text-center my-6">Server Dashboard</h1>
       <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-4 p-4">
         <Card>

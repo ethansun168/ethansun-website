@@ -59,7 +59,7 @@ export function Login() {
   }
 
   return (
-    <div className="w-full  bg-gray-50 shadow-md rounded-lg mx-auto flex flex-col 
+    <div className="w-full bg-gray-50 shadow-md rounded-lg mx-auto flex flex-col 
       min-h-[calc(100vh-5rem)] flex-col justify-center">
 
       <div className="flex flex-1 items-center justify-center">
