@@ -10,21 +10,16 @@ import {
 import { client } from "@/constants";
 import { useQueryClient } from "@tanstack/react-query";
 import { Link, useNavigate } from "react-router-dom";
+import { useUsername } from "@/hooks/query";
 
-interface NavbarProps {
-  username: string;
-  setUsername: React.Dispatch<React.SetStateAction<string>>
-  isLoading: boolean
-};
-
-export default function Navbar(props: NavbarProps) {
+export default function Navbar() {
   const queryClient = useQueryClient();
   const navigate = useNavigate();
+  const {data: username, isLoading} = useUsername();
   async function logout() {
     try {
       await client.api.v1.logout.$get();
-      queryClient.invalidateQueries({queryKey: [ 'user' ]});
-      props.setUsername("");
+      queryClient.setQueryData(['user'], null);
     }
     catch {
       console.log("Logout failed");
@@ -48,8 +43,8 @@ export default function Navbar(props: NavbarProps) {
         </div>
 
         {
-          props.isLoading ? <Spinner/> :
-          props.username ? 
+          isLoading ? <Spinner/> :
+          username ? 
             <DropdownMenu>
               <DropdownMenuTrigger>
                 <Avatar>

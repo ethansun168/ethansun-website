@@ -1,53 +1,58 @@
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
-import { useNavigate } from "react-router-dom";
-import { useEffect, useState } from "react";
-import { client } from "../constants";
 import { useUsername } from "@/hooks/query";
+import { useMutation, useQueryClient } from "@tanstack/react-query";
+import { useEffect, useState } from "react";
+import { useNavigate } from "react-router-dom";
+import { client } from "../constants";
 
-interface LoginProps {
-  setUsername: React.Dispatch<React.SetStateAction<string>>
-};
-
-export function Login(props: LoginProps) {
+export function Login() {
   const [username, setUsername] = useState("");
   const [password, setPassword] = useState(""); 
   const [error, setError] = useState("");
   const navigate = useNavigate();
   const {data, isLoading} = useUsername();
+  const queryClient = useQueryClient();
+
+  const {mutateAsync: loginRequest} = useMutation({
+    mutationFn: async ({username, password}: {username: string, password: string}) => {
+      const response = await client.api.v1.login.$post({
+        json: {
+          username: username,
+          password: password,
+        },
+      })
+      if (!response.ok) {
+        const body = await response.json();
+        if ('message' in body) {
+          throw new Error(body.message);
+        }
+        throw new Error("Unknown error");
+      }
+      return await response.json();
+    },
+    onSuccess: (data) => {
+      setError('');
+      queryClient.setQueryData(['user'], data.username);
+      navigate('/dashboard', {replace: true});
+    },
+    onError: (error) => {
+      setError(String(error));
+    }
+  })
 
   async function login(e: React.FormEvent<HTMLFormElement>) {
     e.preventDefault();
     setUsername("");
     setPassword("");
-    const response = await client.api.v1.login.$post({
-      json: {
-        username: username,
-        password: password,
-      },
-    })
-
-    if (!response.ok) {
-      const body = await response.json();
-      if ('message' in body) {
-        setError(body.message);
-      }
-    }
-    else {
-      setError("");
-      const body = await response.json();
-      props.setUsername(body.username);
-      // Redirect to dashboard
-      navigate('/dashboard', {replace: true});
-    } 
+    await loginRequest({ username, password });
   };
 
   useEffect(() => {
     if (data) {
-      props.setUsername(data);
       navigate('/dashboard', {replace: true});
     }
-  }, [navigate, data, props])
+  }, [data, navigate])
 
   if (isLoading || data) {
     return null;
@@ -93,7 +98,7 @@ export function Login(props: LoginProps) {
             {
               error ? (
                 <p className="mt-1 text-sm text-red-600">
-                  Error: {error}
+                  {error}
                 </p>
               ) : null
             }

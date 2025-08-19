@@ -1,22 +1,19 @@
+import { useUsername } from "@/hooks/query";
 import { useEffect } from "react";
 import { useNavigate } from "react-router-dom";
 
-interface DashboardProps {
-    username: string;
-    setUsername: React.Dispatch<React.SetStateAction<string>>
-};
-
-export function Dashboard(props: DashboardProps) {
-    const navigate = useNavigate();
-    useEffect(() => {
-        if (!props.username) {
-            navigate('/login');
-        }
-    }, [props.username, navigate])
-    if (!props.username) return <>Loading...</>
-    return (
-        <>
-            Welcome {props.username}!
-        </>
-    )
+export function Dashboard() {
+  const navigate = useNavigate();
+  const {data: username} = useUsername();
+  useEffect(() => {
+    if (!username) {
+      navigate('/login');
+    }
+  }, [username, navigate])
+  if (!username) return null;
+  return (
+    <>
+      Welcome {username}!
+    </>
+  )
 }
