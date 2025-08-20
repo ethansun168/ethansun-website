@@ -29,7 +29,7 @@ const wsApp = app.get('/api/v1/minecraft/status', (c) => {
 })
 .post('/api/v1/minecraft/start', requireAuth, async (c) => {
   // If the server isn't on, start it
-  if (mcProcess !== null) return c.json({"message": "Server already started"});
+  if (mcProcess !== null) return c.json({"message": "Server already started"}, 400);
   const jarPath = path.resolve("mc/server.jar");
   const serverDir = path.dirname(jarPath);
   const memory = '2G';
@@ -58,35 +58,32 @@ const wsApp = app.get('/api/v1/minecraft/status', (c) => {
   });
   mcProcess.on('close', (code) => {
     console.log(`child process exited with code ${code}`);
+    logBuffer.length = 0;
     mcProcess = null;
   })
   return c.json({"message": "Server started"});
 })
 .post('/api/v1/minecraft/stop', requireAuth, async(c) => {
   // If the server is on, stop it
-  if (mcProcess === null) return c.json({"message": "Server has not started"});
+  if (mcProcess === null) return c.json({"message": "Server has not started"}, 400);
   mcProcess.stdin.write("stop\n");
   mcProcess.stdin.end();
   return c.json({"message": "Server stopped"});
 })
 .get('/api/v1/minecraft/logs', requireAuth, upgradeWebSocket((c) => {
   const username = c.get('username');
-  console.log(username);
   return {
     onOpen: (event, ws) => {
       clients.set(username, ws);
-      console.log(clients);
-      console.log("opened");
       logBuffer.forEach((line) => {
         ws.send(JSON.stringify({type: 'log', message: line}));
       })
     },
     onMessage: (event, ws) => {
-      console.log(`Command: ${event.data}`);
+      if (event.data === 'frontend-ping') return;
       if (mcProcess) mcProcess.stdin.write(event.data + "\n");
     },
     onClose: () => {
-      console.log('Connection closed');
       clients.delete(username);
     }
   }})
