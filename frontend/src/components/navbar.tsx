@@ -94,6 +94,12 @@ ${hidden ? '-translate-y-full' : 'translate-y-0'}`}
                   </DropdownMenuItem>
                   <DropdownMenuItem
                     className="cursor-pointer"
+                    onClick={() => navigate('/minecraft')}
+                  >
+                    Minecraft
+                  </DropdownMenuItem>
+                  <DropdownMenuItem
+                    className="cursor-pointer"
                     onClick={logout}
                   >
                     Logout

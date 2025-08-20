@@ -3,6 +3,7 @@ import { Dashboard } from './components/dashboard';
 import { Login } from './components/login';
 import Navbar from './components/navbar';
 import { ThemeProvider } from './components/theme-provider';
+import { Minecraft } from './components/minecraft';
 
 function Home() {
   return <h1>Home page </h1>
@@ -26,6 +27,7 @@ function App() {
         <Route path="/contact" element={<Contact />} />
         <Route path="/login" element={<Login />} />
         <Route path="/dashboard" element={<Dashboard />} />
+        <Route path="/minecraft" element={<Minecraft />} />
       </Routes>
     </ThemeProvider>
   )

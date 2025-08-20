@@ -34,7 +34,7 @@ export function Login() {
         return await response.json();
       }
       catch {
-        throw new Error("Unable to connect to server");
+        throw new Error("Cannot connect to server");
       }
     },
     onSuccess: (data) => {

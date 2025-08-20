@@ -1,15 +1,12 @@
 import { Badge } from '@/components/ui/badge';
 import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
 import { client } from '@/constants';
-import { useUsername } from "@/hooks/query";
+import { useRequireAuth } from '@/hooks/auth';
 import { useQuery } from '@tanstack/react-query';
-import { useEffect } from "react";
-import { useNavigate } from "react-router-dom";
 import { Progress } from "./ui/progress";
 
 export function Dashboard() {
-  const navigate = useNavigate();
-  const {data: username, isLoading} = useUsername();
+  const {username, isLoading} = useRequireAuth();
   const {data: systemData} = useQuery({
     queryKey: ['system-status'],
     queryFn: async () => {
@@ -19,12 +16,7 @@ export function Dashboard() {
     },
     refetchInterval: 1000
   })
-  useEffect(() => {
-    if (!username && !isLoading) {
-      navigate('/login');
-    }
-  }, [username, navigate, isLoading])
-  if (!username || !systemData) return null;
+  if (!username || !systemData || isLoading) return null;
 
   return (
     <div className="w-full">
