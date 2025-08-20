@@ -15,17 +15,13 @@ export function Minecraft() {
   const { scrollRef, contentRef } = useStickToBottom();
   const {mutateAsync: handleStart} = useMutation({
     mutationFn: async () => {
-      try {
-        const resp = await minecraftClient.api.v1.minecraft.start.$post(); 
-        if (!resp.ok) {
-          const body = await resp.json();
-          throw new Error(body.message);
-        } 
-        return await resp.json();
-      }
-      catch {
-        throw new Error("Cannot connect to server");
-      }
+      const resp = await minecraftClient.api.v1.minecraft.start.$post(); 
+      if (!resp.ok) {
+        const body = await resp.json();
+        console.log(body.message);
+        throw new Error(body.message);
+      } 
+      return await resp.json();
     },
     onSuccess: () => {
       setButtonError("");
@@ -35,17 +31,12 @@ export function Minecraft() {
 
   const {mutateAsync: handleStop} = useMutation({
     mutationFn: async () => {
-      try {
-        const resp = await minecraftClient.api.v1.minecraft.stop.$post(); 
-        if (!resp.ok) {
-          const body = await resp.json();
-          throw new Error(body.message);
-        } 
-        return await resp.json();
-      }
-      catch {
-        throw new Error("Cannot connect to server");
-      }
+      const resp = await minecraftClient.api.v1.minecraft.stop.$post(); 
+      if (!resp.ok) {
+        const body = await resp.json();
+        throw new Error(body.message);
+      } 
+      return await resp.json();
     },
     onSuccess: () => {
       setButtonError("");
@@ -123,7 +114,11 @@ export function Minecraft() {
               try {
                 await handleStart();
               }
-              catch (error){
+              catch (error) {
+                if (error instanceof TypeError) {
+                  setButtonError("Error: Cannot connect to server");
+                  return;
+                }
                 setButtonError(String(error));
               }
             }}
@@ -137,6 +132,10 @@ export function Minecraft() {
                 await handleStop();
               }
               catch (error){
+                if (error instanceof TypeError) {
+                  setButtonError("Error: Cannot connect to server");
+                  return;
+                }
                 setButtonError(String(error));
               }
             }}
