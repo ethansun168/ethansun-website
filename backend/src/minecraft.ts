@@ -1,9 +1,24 @@
 import { createNodeWebSocket } from "@hono/node-ws";
+import { ChildProcessWithoutNullStreams, spawn } from "child_process";
+import { readdirSync, readFileSync } from "fs";
 import { Hono } from "hono";
 import type { WSContext } from "hono/ws";
-import { requireAuth } from "./auth.js";
-import { spawn, ChildProcessWithoutNullStreams } from "child_process";
 import path from 'path';
+import { requireAuth } from "./auth.js";
+import z from "zod";
+
+const fileItemSchema: z.ZodType<any> = z.lazy(() =>
+  z.object({
+    id: z.string(),
+    name: z.string(),
+    type: z.enum(['file', 'folder']),
+    expanded: z.boolean().optional(),
+    content: z.string().optional(),
+    children: z.array(fileItemSchema).optional(),
+  })
+);
+
+export type FileItem = z.infer<typeof fileItemSchema>;
 
 let mcProcess: ChildProcessWithoutNullStreams | null = null;
 
@@ -17,6 +32,47 @@ const MAX_LOG_LINES = 500;
 function addLog(line: string) {
   logBuffer.push(line);
   if (logBuffer.length > MAX_LOG_LINES) logBuffer.shift();
+}
+
+const generateId = (filePath: string) => Buffer.from(filePath).toString('base64');
+
+function readDirToFileItems(dirPath: string): FileItem[] {
+  const entries = readdirSync(dirPath, { withFileTypes: true });
+  const ignoreDir = ['libraries', 'world', 'logs', 'versions'];
+  const ignoreFiles = ['server.jar'];
+
+  return entries.map((entry) => {
+    const fullPath = path.join(dirPath, entry.name);
+
+    if (entry.isDirectory()) {
+      if (ignoreDir.includes(entry.name)) {
+        return {
+          id: generateId(fullPath),
+          name: entry.name,
+          type: 'folder',
+          expanded: false,
+          children: []
+        }
+      }
+      return {
+        id: generateId(fullPath),
+        name: entry.name,
+        type: 'folder',
+        expanded: false,
+        children: readDirToFileItems(fullPath),
+      };
+    } else {
+      if (ignoreFiles.includes(entry.name)) {
+        return undefined;
+      }
+      return {
+        id: generateId(fullPath),
+        name: entry.name,
+        type: 'file',
+        content: readFileSync(fullPath, 'utf-8'),
+      };
+    }
+  }).filter((item): item is FileItem => item !== undefined);
 }
 
 const wsApp = app.get('/api/v1/minecraft/status', (c) => {
@@ -87,7 +143,19 @@ const wsApp = app.get('/api/v1/minecraft/status', (c) => {
       clients.delete(username);
     }
   }})
-);
+)
+.get('/api/v1/minecraft/files', requireAuth, async (c) => {
+  const mcDir = path.resolve('mc');
+  try {
+    const files = readDirToFileItems(mcDir);
+    const parsedFiles = z.array(fileItemSchema).parse(files);
+    return c.json(parsedFiles);
+  }
+  catch (err) {
+    console.log(err);
+    return c.json([]);
+  }
+})
 
 export type MinecraftApp = typeof wsApp;
 export default app;
