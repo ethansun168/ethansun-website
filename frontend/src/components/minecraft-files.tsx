@@ -9,10 +9,17 @@ import {
     AlertDialogTitle
 } from "@/components/ui/alert-dialog"
 import { Badge } from "@/components/ui/badge"
+import {
+    Breadcrumb,
+    BreadcrumbItem,
+    BreadcrumbList,
+    BreadcrumbSeparator
+} from "@/components/ui/breadcrumb"
 import { Button } from "@/components/ui/button"
 import { Card } from "@/components/ui/card"
 import { ScrollArea } from "@/components/ui/scroll-area"
 import { minecraftClient } from "@/constants"
+import { createMinecraftStatusOptions } from "@/hooks/minecraft-status"
 import { useQuery, useQueryClient } from "@tanstack/react-query"
 import type { FileItem } from "ethansun-website-backend"
 import {
@@ -32,10 +39,9 @@ import {
     X
 } from "lucide-react"
 import { useState } from "react"
+import { Alert, AlertTitle } from "./ui/alert"
 import { Spinner } from "./ui/shadcn-io/spinner"
 import { Textarea } from "./ui/textarea"
-import { createMinecraftStatusOptions } from "@/hooks/minecraft-status"
-import { Alert, AlertTitle } from "./ui/alert"
 
 function getFileIcon(fileName: string, type: "file" | "folder") {
   if (type === "folder") {
@@ -101,7 +107,7 @@ export function MinecraftFiles() {
   const toggleFolder = (id: string) => {
     const updateFiles = (items: FileItem[]): FileItem[] => {
       return items.map((item) => {
-        if (item.id === id && item.type === "folder") {
+        if (item.fullPath === id && item.type === "folder") {
           return { ...item, expanded: !item.expanded }
         }
         if (item.children) {
@@ -117,7 +123,7 @@ export function MinecraftFiles() {
 
 
   const FileTreeItem = ({ item, level = 0 }: { item: FileItem; level?: number }) => (
-    <div key={item.id} className="px-2">
+    <div key={item.fullPath} className="px-2">
       <div
         className={`flex items-center gap-2 p-2 rounded-md
           ${fileExplorerDisabled ?
@@ -128,7 +134,7 @@ export function MinecraftFiles() {
         style={{ paddingLeft: `${level * 20 + 8}px` }}
         onClick={() => {
           if (item.type === "folder") {
-            toggleFolder(item.id)
+            toggleFolder(item.fullPath)
           }
           else {
             openFileInEditor(item);
@@ -142,7 +148,7 @@ export function MinecraftFiles() {
             className="h-4 w-4 p-0"
             onClick={(e) => {
               e.stopPropagation()
-              toggleFolder(item.id)
+              toggleFolder(item.fullPath)
             }}
           >
             {item.expanded ? <ChevronDown className="h-3 w-3" /> : <ChevronRight className="h-3 w-3" />}
@@ -154,7 +160,7 @@ export function MinecraftFiles() {
       {item.type === "folder" && item.expanded && item.children && (
         <div>
           {item.children.map((child: FileItem) => (
-            <FileTreeItem key={child.id} item={child} level={level + 1} />
+            <FileTreeItem key={child.fullPath} item={child} level={level + 1} />
           ))}
         </div>
       )}
@@ -188,7 +194,7 @@ export function MinecraftFiles() {
     if (openFile) {
       const updateFileContent = (items: FileItem[]): FileItem[] => {
         return items.map((item) => {
-          if (item.id === openFile.id) {
+          if (item.fullPath === openFile.fullPath) {
             return { ...item, content: fileContent }
           }
           if (item.children) {
@@ -230,7 +236,7 @@ export function MinecraftFiles() {
         </div>
         <ScrollArea className="flex-1 min-h-0">
           {files.map((item) => (
-            <div key={item.id}>
+            <div key={item.fullPath}>
               <FileTreeItem item={item} />
             </div>
           ))}
@@ -252,7 +258,32 @@ export function MinecraftFiles() {
             openFile ? 
               <div className="flex items-center gap-2">
                 {getFileIcon(openFile.name, openFile.type)}
-                <span className="font-medium">{openFile.name}</span>
+                <Breadcrumb>
+                  <BreadcrumbList>
+                    {openFile
+                      .fullPath
+                      .split('/')
+                      .filter(Boolean)
+                      .map((part: string, index: number, arr: string[]) => {
+                        const href = "/" + arr.slice(0, index + 1).join("/")
+                        const isLast = index === arr.length - 1;
+                        return (
+                          <BreadcrumbItem key={href}>
+                            {!isLast ? (
+                                <>
+                                {part}
+                                  <BreadcrumbSeparator />
+                                </>
+                              ) : (
+                                <span>{part}</span>
+                            )}
+                          </BreadcrumbItem>
+                        )
+                      })
+                    }
+                  </BreadcrumbList>
+                </Breadcrumb>
+
                 {hasUnsavedChanges && (
                   <Badge variant="destructive" className="text-xs">
                     Unsaved
