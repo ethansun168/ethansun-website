@@ -64,7 +64,7 @@ function readDirToFileItems(dirPath: string): FileItem[] {
         }
       }
       return {
-        fullPath: fullPath
+        fullPath: fullPath,
         name: entry.name,
         type: 'folder',
         expanded: false,
