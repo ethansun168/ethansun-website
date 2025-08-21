@@ -4,8 +4,8 @@ import { readdirSync, readFileSync } from "fs";
 import { Hono } from "hono";
 import type { WSContext } from "hono/ws";
 import path from 'path';
-import { requireAuth } from "./auth.js";
 import z from "zod";
+import { requireAuth } from "./auth.js";
 
 const fileItemSchema: z.ZodType<any> = z.lazy(() =>
   z.object({
@@ -41,7 +41,13 @@ function readDirToFileItems(dirPath: string): FileItem[] {
   const ignoreDir = ['libraries', 'world', 'logs', 'versions'];
   const ignoreFiles = ['server.jar'];
 
-  return entries.map((entry) => {
+  const sortedEntries = entries.sort((a, b) => {
+    if (a.isDirectory() && !b.isDirectory()) return -1;
+    if (!a.isDirectory() && b.isDirectory()) return 1;
+    return a.name.localeCompare(b.name);
+  });
+
+  return sortedEntries.map((entry) => {
     const fullPath = path.join(dirPath, entry.name);
 
     if (entry.isDirectory()) {
@@ -51,7 +57,12 @@ function readDirToFileItems(dirPath: string): FileItem[] {
           name: entry.name,
           type: 'folder',
           expanded: false,
-          children: []
+          children: [{
+            id: generateId(path.join(dirPath, '...')),
+            name: '...',
+            type: 'file',
+            content: ''
+          }]
         }
       }
       return {
@@ -129,13 +140,13 @@ const wsApp = app.get('/api/v1/minecraft/status', (c) => {
 .get('/api/v1/minecraft/logs', requireAuth, upgradeWebSocket((c) => {
   const username = c.get('username');
   return {
-    onOpen: (event, ws) => {
+    onOpen: (_, ws) => {
       clients.set(username, ws);
       logBuffer.forEach((line) => {
         ws.send(JSON.stringify({type: 'log', message: line}));
       })
     },
-    onMessage: (event, ws) => {
+    onMessage: (event, _) => {
       if (event.data === 'frontend-ping') return;
       if (mcProcess) mcProcess.stdin.write(event.data + "\n");
     },
