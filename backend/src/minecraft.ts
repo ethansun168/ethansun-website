@@ -9,7 +9,7 @@ import { requireAuth } from "./auth.js";
 
 const fileItemSchema: z.ZodType<any> = z.lazy(() =>
   z.object({
-    id: z.string(),
+    fullPath: z.string(),
     name: z.string(),
     type: z.enum(['file', 'folder']),
     expanded: z.boolean().optional(),
@@ -34,8 +34,6 @@ function addLog(line: string) {
   if (logBuffer.length > MAX_LOG_LINES) logBuffer.shift();
 }
 
-const generateId = (filePath: string) => Buffer.from(filePath).toString('base64');
-
 function readDirToFileItems(dirPath: string): FileItem[] {
   const entries = readdirSync(dirPath, { withFileTypes: true });
   const ignoreDir = ['libraries', 'world', 'logs', 'versions'];
@@ -53,12 +51,12 @@ function readDirToFileItems(dirPath: string): FileItem[] {
     if (entry.isDirectory()) {
       if (ignoreDir.includes(entry.name)) {
         return {
-          id: generateId(fullPath),
+          fullPath: fullPath,
           name: entry.name,
           type: 'folder',
           expanded: false,
           children: [{
-            id: generateId(path.join(dirPath, '...')),
+            fullPath: path.join(dirPath, '...'),
             name: '...',
             type: 'file',
             content: ''
@@ -66,7 +64,7 @@ function readDirToFileItems(dirPath: string): FileItem[] {
         }
       }
       return {
-        id: generateId(fullPath),
+        fullPath: fullPath
         name: entry.name,
         type: 'folder',
         expanded: false,
@@ -77,7 +75,7 @@ function readDirToFileItems(dirPath: string): FileItem[] {
         return undefined;
       }
       return {
-        id: generateId(fullPath),
+        fullPath: fullPath,
         name: entry.name,
         type: 'file',
         content: readFileSync(fullPath, 'utf-8'),
