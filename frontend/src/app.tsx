@@ -4,10 +4,7 @@ import { Login } from './components/login';
 import Navbar from './components/navbar';
 import { ThemeProvider } from './components/theme-provider';
 import { Minecraft } from './components/minecraft';
-
-function Home() {
-  return <h1>Home page </h1>
-}
+import { Home } from './components/home';
 
 function About() {
   return <h1>About page </h1>

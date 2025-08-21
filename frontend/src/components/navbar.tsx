@@ -52,7 +52,8 @@ export default function Navbar() {
   return (
     <nav
       className={`sticky top-0 w-full shadow-md transition-transform duration-300 z-50 border-b
-${hidden ? '-translate-y-full' : 'translate-y-0'}`}
+        ${hidden ? '-translate-y-full' : 'translate-y-0'}`
+      }
     >
       <div className="max-w-7xl mx-auto flex justify-between items-center p-4">
         <div className="flex items-center space-x-4 flex-shrink-0">
