@@ -21,6 +21,7 @@ const fileItemSchema: z.ZodType<any> = z.lazy(() =>
 export type FileItem = z.infer<typeof fileItemSchema>;
 
 let mcProcess: ChildProcessWithoutNullStreams | null = null;
+const MC_DIR = path.resolve('mc');
 
 const app = new Hono();
 export const { injectWebSocket, upgradeWebSocket } = createNodeWebSocket({ app });
@@ -47,16 +48,17 @@ function readDirToFileItems(dirPath: string): FileItem[] {
 
   return sortedEntries.map((entry) => {
     const fullPath = path.join(dirPath, entry.name);
+    const relativePath = path.relative(MC_DIR, fullPath);
 
     if (entry.isDirectory()) {
       if (ignoreDir.includes(entry.name)) {
         return {
-          fullPath: fullPath,
+          fullPath: relativePath,
           name: entry.name,
           type: 'folder',
           expanded: false,
           children: [{
-            fullPath: path.join(dirPath, '...'),
+            fullPath: path.join(relativePath, '...'),
             name: '...',
             type: 'file',
             content: ''
@@ -64,7 +66,7 @@ function readDirToFileItems(dirPath: string): FileItem[] {
         }
       }
       return {
-        fullPath: fullPath,
+        fullPath: relativePath,
         name: entry.name,
         type: 'folder',
         expanded: false,
@@ -75,7 +77,7 @@ function readDirToFileItems(dirPath: string): FileItem[] {
         return undefined;
       }
       return {
-        fullPath: fullPath,
+        fullPath: relativePath,
         name: entry.name,
         type: 'file',
         content: readFileSync(fullPath, 'utf-8'),
@@ -154,9 +156,8 @@ const wsApp = app.get('/api/v1/minecraft/status', (c) => {
   }})
 )
 .get('/api/v1/minecraft/files', requireAuth, async (c) => {
-  const mcDir = path.resolve('mc');
   try {
-    const files = readDirToFileItems(mcDir);
+    const files = readDirToFileItems(MC_DIR);
     const parsedFiles = z.array(fileItemSchema).parse(files);
     return c.json(parsedFiles);
   }
