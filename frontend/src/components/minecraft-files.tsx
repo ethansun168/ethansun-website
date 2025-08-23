@@ -226,7 +226,7 @@ export function MinecraftFiles() {
   }
 
   return (
-    <Card className="flex flex-row h-[calc(100vh-200px)] p-0 shadow-lg gap-0">
+    <Card className="flex flex-row h-[calc(100vh-200px)] p-0 shadow-lg gap-0 border">
       <div className="flex flex-col h-full">
         <div className=" p-4 flex items-center gap-2">
           <h2 className="text-lg font-semibold">File Explorer</h2>

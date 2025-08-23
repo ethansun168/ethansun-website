@@ -69,7 +69,7 @@ export function MinecraftConsole() {
   }, [sendMessage])
 
   return (
-    <Card className="w-full mx-auto shadow-lg border border-gray-200 dark:border-gray-700">
+    <Card className="flex flex-col h-[calc(100vh-200px)] w-full mx-auto shadow-lg border border-gray-200 dark:border-gray-700">
       <CardHeader>
         <CardTitle className="text-xl font-mono ">
           Minecraft Server Output 
@@ -79,10 +79,10 @@ export function MinecraftConsole() {
           }
         </CardTitle>
       </CardHeader>
-      <CardContent className="flex flex-col gap-4">
+      <CardContent className="flex flex-col gap-4 flex-1">
         <div
           ref={scrollRef}
-          className="h-96 overflow-y-auto p-2 bg-gray-50 dark:bg-gray-900 rounded-md border border-gray-200 dark:border-gray-700 font-mono text-sm">
+          className="flex-1 overflow-y-auto p-2 bg-gray-50 dark:bg-gray-900 rounded-md border border-gray-200 dark:border-gray-700 font-mono text-sm">
           <div ref={contentRef}>
             {messages.map((msg, i) => {
               const messageJSON = JSON.parse(msg);

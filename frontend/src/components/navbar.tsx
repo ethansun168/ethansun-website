@@ -55,12 +55,12 @@ export default function Navbar() {
         ${hidden ? '-translate-y-full' : 'translate-y-0'}`
       }
     >
-      <div className="max-w-7xl mx-auto flex justify-between items-center p-4">
-        <div className="flex items-center space-x-4 flex-shrink-0">
+      <div className="w-full flex justify-between p-4">
+        <div className="flex space-x-4">
 
           <span className="font-bold text-lg">mirt smegle b</span>
 
-          <div className="hidden md:flex items-center space-x-4">
+          <div className="hidden md:flex space-x-4">
             {
               navLinks.map(link => (
                 <Link
@@ -75,7 +75,7 @@ export default function Navbar() {
           </div>
         </div>
 
-        <div className="flex items-center space-x-4 flex-shrink-0 ml-auto">
+        <div className="flex space-x-4">
           <ModeToggle />
           {isLoading ? (
             <Spinner />

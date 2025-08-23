@@ -5,7 +5,7 @@ The website is located at https://ethansun.org
 ```
 # Build backend
 cd backend && npm ci && npm run build
-## Install frontend dependencies
+# Install frontend dependencies
 npm install
 npm run dev
 ```
@@ -15,6 +15,7 @@ npm run dev
 - TypeScript
 - React
 - shadcn
+- React Query
 
 # References
 - [Github Pages](https://docs.github.com/en/pages/configuring-a-custom-domain-for-your-github-pages-site/about-custom-domains-and-github-pages)

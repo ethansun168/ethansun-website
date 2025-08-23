@@ -14,6 +14,8 @@ export function Minecraft() {
   
   return (
     <div className="w-full max-w-7xl mt-8 px-4 mx-auto ">
+    {/* <div className="w-full h-screen mt-8 px-4 mx-auto"> */}
+    {/* <div className="w-full max-w-screen-2xl mt-8 px-4 mx-auto "> */}
       <Tabs defaultValue="console">
         <TabsList>
           <TabsTrigger value="console">Console</TabsTrigger>
