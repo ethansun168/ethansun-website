@@ -21,7 +21,8 @@ const fileItemSchema: z.ZodType<any> = z.lazy(() =>
 export type FileItem = z.infer<typeof fileItemSchema>;
 
 let mcProcess: ChildProcessWithoutNullStreams | null = null;
-const MC_DIR = path.resolve('mc');
+let MC_VERSION = '1.21.8';
+let MC_DIR = path.resolve(`mc/${MC_VERSION}`);
 
 const app = new Hono();
 export const { injectWebSocket, upgradeWebSocket } = createNodeWebSocket({ app });
@@ -97,7 +98,8 @@ const wsApp = app.get('/api/v1/minecraft/status', (c) => {
 .post('/api/v1/minecraft/start', requireAuth, async (c) => {
   // If the server isn't on, start it
   if (mcProcess !== null) return c.json({"message": "Server already started"}, 400);
-  const jarPath = path.resolve("mc/server.jar");
+  const jarPath = path.join(MC_DIR, 'server.jar');
+  console.log(jarPath);
   const serverDir = path.dirname(jarPath);
   const memory = '2G';
   mcProcess = spawn(
@@ -165,6 +167,9 @@ const wsApp = app.get('/api/v1/minecraft/status', (c) => {
     console.log(err);
     return c.json([]);
   }
+})
+.get('/api/v1/minecraft/version', requireAuth, async (c) => {
+  return c.json({version: MC_VERSION});
 })
 
 export type MinecraftApp = typeof wsApp;
