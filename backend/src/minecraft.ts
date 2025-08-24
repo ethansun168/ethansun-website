@@ -24,8 +24,6 @@ let mcProcess: ChildProcessWithoutNullStreams | null = null;
 let MC_VERSION = '1.21.8';
 let MC_DIR = path.resolve(`mc/${MC_VERSION}`);
 
-const app = new Hono();
-export const { injectWebSocket, upgradeWebSocket } = createNodeWebSocket({ app });
 
 const clients = new Map<string, WSContext<WebSocket>>();
 const logBuffer: string[] = [];
@@ -87,6 +85,8 @@ function readDirToFileItems(dirPath: string): FileItem[] {
   }).filter((item): item is FileItem => item !== undefined);
 }
 
+const app = new Hono();
+export const { injectWebSocket, upgradeWebSocket } = createNodeWebSocket({ app });
 const wsApp = app.get('/api/v1/minecraft/status', (c) => {
   if (mcProcess) {
     return c.json({"status": "online"});
@@ -170,6 +170,21 @@ const wsApp = app.get('/api/v1/minecraft/status', (c) => {
 })
 .get('/api/v1/minecraft/version', requireAuth, async (c) => {
   return c.json({version: MC_VERSION});
+})
+.get('/api/v1/minecraft/versions', requireAuth, async(c) => {
+  interface VersionType {
+    id: string,
+    type: 'release' | 'snapshot',
+    url: string,
+    time: string,
+    releaseTime: string
+  };
+  const manifest = 'https://launchermeta.mojang.com/mc/game/version_manifest.json';
+  const resp = await fetch(manifest);
+  const body = await resp.json();
+  const versions = body.versions.filter((version: VersionType) => version.type === 'release').map((version: VersionType) => version.id);
+  // const versions = body.versions.map((version: VersionType) => version.id);
+  return c.json(versions);
 })
 
 export type MinecraftApp = typeof wsApp;
