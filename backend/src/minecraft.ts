@@ -184,7 +184,7 @@ const wsApp = app.get('/api/v1/minecraft/status', (c) => {
   const body = await resp.json();
   const versions = body.versions.filter((version: VersionType) => version.type === 'release').map((version: VersionType) => version.id);
   // const versions = body.versions.map((version: VersionType) => version.id);
-  return c.json(versions);
+  return c.json({ versions: versions });
 })
 
 export type MinecraftApp = typeof wsApp;
