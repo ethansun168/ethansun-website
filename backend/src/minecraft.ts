@@ -1,11 +1,23 @@
 import { createNodeWebSocket } from "@hono/node-ws";
+import { zValidator } from "@hono/zod-validator";
 import { ChildProcessWithoutNullStreams, spawn } from "child_process";
-import { readdirSync, readFileSync } from "fs";
+import { readdirSync, readFileSync, writeFileSync } from "fs";
 import { Hono } from "hono";
 import type { WSContext } from "hono/ws";
 import path from 'path';
 import z from "zod";
 import { requireAuth } from "./auth.js";
+
+// Get mc version from mc/config
+const MC_CONFIG = 'mc/config';
+const config = readFileSync(path.resolve(MC_CONFIG), 'utf-8');
+let MC_VERSION = config.split('=')[1];
+let MC_DIR = path.resolve(`mc/${MC_VERSION}`);
+
+function saveVersion(version: string) {
+  writeFileSync(path.resolve(MC_CONFIG), `version=${version}`, 'utf-8');
+  MC_VERSION = version;
+}
 
 const fileItemSchema: z.ZodType<any> = z.lazy(() =>
   z.object({
@@ -21,8 +33,6 @@ const fileItemSchema: z.ZodType<any> = z.lazy(() =>
 export type FileItem = z.infer<typeof fileItemSchema>;
 
 let mcProcess: ChildProcessWithoutNullStreams | null = null;
-let MC_VERSION = '1.21.8';
-let MC_DIR = path.resolve(`mc/${MC_VERSION}`);
 
 
 const clients = new Map<string, WSContext<WebSocket>>();
@@ -171,6 +181,21 @@ const wsApp = app.get('/api/v1/minecraft/status', (c) => {
 .get('/api/v1/minecraft/version', requireAuth, async (c) => {
   return c.json({version: MC_VERSION});
 })
+.post('api/v1/minecraft/version',
+  requireAuth,
+  zValidator(
+    'json',
+    z.object({
+      version: z.string()
+    })
+  ),
+  async(c) => {
+    const { version } = c.req.valid('json');
+    saveVersion(version);
+    console.log("gloabl is", MC_VERSION);
+    return c.json({"message": "ok"});
+  }
+)
 .get('/api/v1/minecraft/versions', requireAuth, async(c) => {
   interface VersionType {
     id: string,
