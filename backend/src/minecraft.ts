@@ -17,6 +17,7 @@ let MC_DIR = path.resolve(`mc/${MC_VERSION}`);
 function saveVersion(version: string) {
   writeFileSync(path.resolve(MC_CONFIG), `version=${version}`, 'utf-8');
   MC_VERSION = version;
+  MC_DIR = path.resolve(`mc/${MC_VERSION}`);
 }
 
 const fileItemSchema: z.ZodType<any> = z.lazy(() =>
@@ -109,7 +110,6 @@ const wsApp = app.get('/api/v1/minecraft/status', (c) => {
   // If the server isn't on, start it
   if (mcProcess !== null) return c.json({"message": "Server already started"}, 400);
   const jarPath = path.join(MC_DIR, 'server.jar');
-  console.log(jarPath);
   const serverDir = path.dirname(jarPath);
   const memory = '2G';
   mcProcess = spawn(
@@ -192,7 +192,6 @@ const wsApp = app.get('/api/v1/minecraft/status', (c) => {
   async(c) => {
     const { version } = c.req.valid('json');
     saveVersion(version);
-    console.log("gloabl is", MC_VERSION);
     return c.json({"message": "ok"});
   }
 )
