@@ -18,8 +18,7 @@ import {
 import { Button } from "@/components/ui/button"
 import { Card } from "@/components/ui/card"
 import { ScrollArea } from "@/components/ui/scroll-area"
-import { minecraftClient } from "@/constants"
-import { createMinecraftStatusOptions } from "@/hooks/minecraft-status"
+import { createMinecraftStatusOptions } from "@/hooks/minecraft"
 import { useQuery, useQueryClient } from "@tanstack/react-query"
 import type { FileItem } from "ethansun-website-backend"
 import {
@@ -42,6 +41,7 @@ import { useState } from "react"
 import { Alert, AlertTitle } from "./ui/alert"
 import { Spinner } from "./ui/shadcn-io/spinner"
 import { Textarea } from "./ui/textarea"
+import { createMinecraftFilesOptions } from "@/hooks/minecraft"
 
 function getFileIcon(fileName: string, type: "file" | "folder") {
   if (type === "folder") {
@@ -62,6 +62,7 @@ function getFileIcon(fileName: string, type: "file" | "folder") {
     case "pdf":
     case "doc":
     case "docx":
+    case "properties":
       return <FileText className="h-4 w-4 text-red-500" />
     case "js":
     case "ts":
@@ -96,13 +97,8 @@ export function MinecraftFiles() {
   const queryClient = useQueryClient();
   const {data: status, isLoading: statusLoading } = useQuery(createMinecraftStatusOptions());
   const fileExplorerDisabled = statusLoading || status === 'online';
-  const {data: files = [], isLoading: filesLoading} = useQuery({
-    queryKey: ['files'],
-    queryFn: async () => {
-      const resp = await minecraftClient.api.v1.minecraft.files.$get();
-      return await resp.json();
-    }
-  })
+
+  const {data: files = [], isLoading: filesLoading} = useQuery(createMinecraftFilesOptions());
 
   const toggleFolder = (id: string) => {
     const updateFiles = (items: FileItem[]): FileItem[] => {
@@ -169,7 +165,7 @@ export function MinecraftFiles() {
 
   const isEditableFile = (fileName: string) => {
     const extension = fileName.split(".").pop()?.toLowerCase()
-    return ["txt", "md", "json", "js", "ts", "jsx", "tsx", "css", "html", "xml", "yaml", "yml", "csv"].includes(
+    return ["txt", "md", "json", "js", "ts", "jsx", "tsx", "css", "html", "xml", "yaml", "yml", "csv", "properties"].includes(
       extension || "",
     )
   }

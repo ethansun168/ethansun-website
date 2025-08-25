@@ -2,7 +2,7 @@ import { Button } from "@/components/ui/button";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { Input } from "@/components/ui/input";
 import { minecraftClient } from "@/constants";
-import { createMinecraftStatusOptions } from "@/hooks/minecraft-status";
+import { createMinecraftStatusOptions } from "@/hooks/minecraft";
 import { useMutation, useQuery, useQueryClient } from "@tanstack/react-query";
 import { useEffect, useState } from 'react';
 import { useStickToBottom } from 'use-stick-to-bottom';
@@ -71,7 +71,7 @@ export function MinecraftConsole() {
   return (
     <Card className="flex flex-col h-[calc(100vh-200px)] w-full mx-auto shadow-lg border border-gray-200 dark:border-gray-700">
       <CardHeader>
-        <CardTitle className="text-xl font-mono ">
+        <CardTitle className="text-xl font-mono">
           Minecraft Server Output 
           {
             statusLoading ? <span className="inline-block ml-2"><Spinner className="w-4 h-4" /></span> :
@@ -79,7 +79,7 @@ export function MinecraftConsole() {
           }
         </CardTitle>
       </CardHeader>
-      <CardContent className="flex flex-col gap-4 flex-1">
+      <CardContent className="flex flex-col gap-4 flex-1 min-h-0">
         <div
           ref={scrollRef}
           className="flex-1 overflow-y-auto p-2 bg-gray-50 dark:bg-gray-900 rounded-md border border-gray-200 dark:border-gray-700 font-mono text-sm">

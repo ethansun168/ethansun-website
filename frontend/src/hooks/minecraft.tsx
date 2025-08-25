@@ -12,3 +12,13 @@ export function createMinecraftStatusOptions() {
     refetchInterval: 5000,
   })
 }
+
+export function createMinecraftFilesOptions() {
+  return queryOptions({
+    queryKey: ['files'],
+    queryFn: async () => {
+      const resp = await minecraftClient.api.v1.minecraft.files.$get();
+      return await resp.json();
+    }
+  })
+}
