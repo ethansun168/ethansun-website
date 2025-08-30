@@ -1,22 +1,16 @@
+import { useEffect, useState } from 'react';
 import { Route, Routes } from 'react-router-dom';
+import { About } from './components/about';
 import { Dashboard } from './components/dashboard';
-import { Login } from './components/login';
-import Navbar from './components/navbar';
-import { ThemeProvider } from './components/theme-provider';
-import { Minecraft } from './components/minecraft';
-import { Home } from './components/home';
 import { Game } from './components/game/game';
 import { Shop } from './components/game/shop';
-import { useEffect, useState } from 'react';
+import { Home } from './components/home';
+import { Login } from './components/login';
+import { Minecraft } from './components/minecraft';
+import Navbar from './components/navbar';
 import { NotFound } from './components/not-found';
-
-function About() {
-  return <h1>About page </h1>
-}
-
-function Contact() {
-  return <h1>Contact page </h1>
-}
+import { ThemeProvider } from './components/theme-provider';
+import { Contact } from './components/contact';
 
 export type UserItem = {
   id: number,
