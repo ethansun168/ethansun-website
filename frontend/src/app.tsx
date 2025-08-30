@@ -8,6 +8,7 @@ import { Home } from './components/home';
 import { Game } from './components/game/game';
 import { Shop } from './components/game/shop';
 import { useEffect, useState } from 'react';
+import { NotFound } from './components/not-found';
 
 function About() {
   return <h1>About page </h1>
@@ -56,6 +57,7 @@ function App() {
         <Route path="/minecraft" element={<Minecraft />} />
         <Route path="/game" element={<Game points={points} setPoints={setPoints} items={items} setItems={setItems} />} />
         <Route path="/shop" element={<Shop points={points} setPoints={setPoints} items={items} setItems={setItems} />} />
+        <Route path="*" element={<NotFound />} />
       </Routes>
     </ThemeProvider>
   )
