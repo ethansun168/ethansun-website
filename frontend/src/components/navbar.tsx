@@ -17,6 +17,7 @@ import { ModeToggle } from "./mode-toggle";
 
 const navLinks = [
   { name: 'Home', to: '/' },
+  { name: 'Game', to: '/game' },
   { name: 'About', to: '/about' },
   { name: 'Contact', to: '/contact' },
 ];
@@ -51,7 +52,7 @@ export default function Navbar() {
 
   return (
     <nav
-      className={`sticky top-0 w-full shadow-md transition-transform duration-300 z-50 border-b
+      className={`sticky top-0 w-full shadow-md transition-transform duration-300 z-50 border-b h-16
         ${hidden ? '-translate-y-full' : 'translate-y-0'}`
       }
     >

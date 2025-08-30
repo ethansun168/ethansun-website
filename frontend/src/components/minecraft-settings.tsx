@@ -36,7 +36,8 @@ export function MinecraftSettings() {
     }
   })
 
-  const {mutateAsync: saveVersion} = useMutation({
+  const [saveSettingsState, setSaveSettingsState] = useState<null | "success" | "error">(null);
+  const {mutateAsync: saveSettings} = useMutation({
     mutationFn: async ({version}: {version: string}) => {
       await minecraftClient.api.v1.minecraft.version.$post({
         json: {
@@ -48,6 +49,10 @@ export function MinecraftSettings() {
       queryClient.invalidateQueries({
         queryKey: createMinecraftFilesOptions().queryKey
       });
+      setSaveSettingsState("success");
+    },
+    onError: () => {
+      setSaveSettingsState("error");
     }
   })
 
@@ -69,7 +74,14 @@ export function MinecraftSettings() {
               <AlertTitle>Settings disabled because server is online.</AlertTitle>
             </Alert> : null
         }
-
+        { //TODO: finish this
+          saveSettingsState === "success" ?
+            <Alert>
+            </Alert> :
+            saveSettingsState === "error" ?
+              <Alert>
+              </Alert> : null
+        }
         <div className="grid grid-cols-1 lg:grid-cols-2 gap-6">
           <Card className="shadow-lg bg-secondary">
             <CardHeader className="rounded-t-lg">
@@ -108,7 +120,7 @@ export function MinecraftSettings() {
         </div>
         <div className="flex justify-center pt-6">
           <Button disabled={settingsDisabled} size="lg" className=" bg-emerald-600 hover:bg-emerald-700 text-white px-8 py-3 text-lg" onClick={() => {
-            saveVersion({ version: selectedVersion });
+            saveSettings({ version: selectedVersion });
           }}>
             <Save className="h-5 w-5 mr-2" />
             Save All Settings
