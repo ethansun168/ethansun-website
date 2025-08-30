@@ -20,3 +20,4 @@ npm run dev
 # References
 - [Github Pages](https://docs.github.com/en/pages/configuring-a-custom-domain-for-your-github-pages-site/about-custom-domains-and-github-pages)
 - [Vite Setup](https://vite.dev/guide/static-deploy)
+- [Github Pages SPA setup](https://github.com/rafgraph/spa-github-pages/)
