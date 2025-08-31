@@ -11,12 +11,12 @@ export function Login() {
   const queryClient = useQueryClient();
   const navigate = useNavigate();
   const [username, setUsername] = useState("");
-  const [password, setPassword] = useState(""); 
+  const [password, setPassword] = useState("");
   const [error, setError] = useState("");
-  const {data, isLoading} = useUsername();
+  const { data, isLoading } = useUsername();
 
-  const {mutateAsync: loginRequest} = useMutation({
-    mutationFn: async ({username, password}: {username: string, password: string}) => {
+  const { mutateAsync: loginRequest } = useMutation({
+    mutationFn: async ({ username, password }: { username: string, password: string }) => {
       try {
         const response = await client.api.v1.login.$post({
           json: {
@@ -40,7 +40,7 @@ export function Login() {
     onSuccess: (data) => {
       setError('');
       queryClient.setQueryData(['user'], data.username);
-      navigate('/dashboard', {replace: true});
+      navigate('/dashboard', { replace: true });
     },
     onError: (error) => {
       setError(String(error));
@@ -56,7 +56,7 @@ export function Login() {
 
   useEffect(() => {
     if (data) {
-      navigate('/dashboard', {replace: true});
+      navigate('/dashboard', { replace: true });
     }
   }, [data, navigate])
 

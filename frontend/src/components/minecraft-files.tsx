@@ -1,19 +1,19 @@
 import {
-    AlertDialog,
-    AlertDialogAction,
-    AlertDialogCancel,
-    AlertDialogContent,
-    AlertDialogDescription,
-    AlertDialogFooter,
-    AlertDialogHeader,
-    AlertDialogTitle
+  AlertDialog,
+  AlertDialogAction,
+  AlertDialogCancel,
+  AlertDialogContent,
+  AlertDialogDescription,
+  AlertDialogFooter,
+  AlertDialogHeader,
+  AlertDialogTitle
 } from "@/components/ui/alert-dialog"
 import { Badge } from "@/components/ui/badge"
 import {
-    Breadcrumb,
-    BreadcrumbItem,
-    BreadcrumbList,
-    BreadcrumbSeparator
+  Breadcrumb,
+  BreadcrumbItem,
+  BreadcrumbList,
+  BreadcrumbSeparator
 } from "@/components/ui/breadcrumb"
 import { Button } from "@/components/ui/button"
 import { Card } from "@/components/ui/card"
@@ -22,20 +22,20 @@ import { createMinecraftStatusOptions } from "@/hooks/minecraft"
 import { useQuery, useQueryClient } from "@tanstack/react-query"
 import type { FileItem } from "ethansun-website-backend"
 import {
-    AlertCircleIcon,
-    Archive,
-    ChevronDown,
-    ChevronRight,
-    Code,
-    File,
-    FileText,
-    Folder,
-    ImageIcon,
-    Music,
-    Save,
-    Upload,
-    Video,
-    X
+  AlertCircleIcon,
+  Archive,
+  ChevronDown,
+  ChevronRight,
+  Code,
+  File,
+  FileText,
+  Folder,
+  ImageIcon,
+  Music,
+  Save,
+  Upload,
+  Video,
+  X
 } from "lucide-react"
 import { useState } from "react"
 import { Alert, AlertTitle } from "./ui/alert"
@@ -95,10 +95,10 @@ export function MinecraftFiles() {
   const [hasUnsavedChanges, setHasUnsavedChanges] = useState(false)
   const [alertOpen, setAlertOpen] = useState(false);
   const queryClient = useQueryClient();
-  const {data: status, isLoading: statusLoading } = useQuery(createMinecraftStatusOptions());
+  const { data: status, isLoading: statusLoading } = useQuery(createMinecraftStatusOptions());
   const fileExplorerDisabled = statusLoading || status === 'online';
 
-  const {data: files = [], isLoading: filesLoading} = useQuery(createMinecraftFilesOptions());
+  const { data: files = [], isLoading: filesLoading } = useQuery(createMinecraftFilesOptions());
 
   const toggleFolder = (id: string) => {
     const updateFiles = (items: FileItem[]): FileItem[] => {
@@ -123,8 +123,8 @@ export function MinecraftFiles() {
       <div
         className={`flex items-center gap-2 p-2 rounded-md
           ${fileExplorerDisabled ?
-          'opacity-50 cursor-not-allowed pointer-events-none' :
-          'hover:bg-accent cursor-pointer'}
+            'opacity-50 cursor-not-allowed pointer-events-none' :
+            'hover:bg-accent cursor-pointer'}
         `}
 
         style={{ paddingLeft: `${level * 20 + 8}px` }}
@@ -227,7 +227,7 @@ export function MinecraftFiles() {
         <div className=" p-4 flex items-center gap-2">
           <h2 className="text-lg font-semibold">File Explorer</h2>
           {
-            filesLoading ? <Spinner/> : null
+            filesLoading ? <Spinner /> : null
           }
         </div>
         <ScrollArea className="flex-1 min-h-0">
@@ -244,14 +244,14 @@ export function MinecraftFiles() {
         {/* Toolbar */}
         <div className="flex items-center justify-between p-4 border-b gap-4">
           {
-            fileExplorerDisabled ? 
+            fileExplorerDisabled ?
               <Alert variant="destructive" className="inline-flex w-auto">
                 <AlertCircleIcon />
                 <AlertTitle>File explorer disabled because server is online.</AlertTitle>
               </Alert> : null
           }
           {
-            openFile ? 
+            openFile ?
               <div className="flex items-center gap-2">
                 {getFileIcon(openFile.name, openFile.type)}
                 <Breadcrumb>
@@ -266,12 +266,12 @@ export function MinecraftFiles() {
                         return (
                           <BreadcrumbItem key={href}>
                             {!isLast ? (
-                                <>
+                              <>
                                 {part}
-                                  <BreadcrumbSeparator />
-                                </>
-                              ) : (
-                                <span>{part}</span>
+                                <BreadcrumbSeparator />
+                              </>
+                            ) : (
+                              <span>{part}</span>
                             )}
                           </BreadcrumbItem>
                         )
@@ -285,11 +285,11 @@ export function MinecraftFiles() {
                     Unsaved
                   </Badge>
                 )}
-              </div>: null
-          } 
+              </div> : null
+          }
           <div className="flex items-center gap-2 ml-auto">
             {
-              openFile ? 
+              openFile ?
                 <>
                   <Button variant="ghost" size="sm" onClick={closeEditor}>
                     <X className="h-4 w-4" />
@@ -301,7 +301,7 @@ export function MinecraftFiles() {
                     onClick={saveFile}
                     disabled={!hasUnsavedChanges || fileExplorerDisabled}>
                     <Save className="mr-2 h-4 w-4"
-                  />
+                    />
                     Save
                   </Button>
                 </> : null
@@ -339,26 +339,26 @@ export function MinecraftFiles() {
                 className="w-full h-full resize-none font-mono text-sm overflow-auto"
               />
             </div>
-          ) : 
+          ) :
             openFile === null ?
-            (
-              <div className="flex-1 flex items-center justify-center text-muted-foreground">
-                <div className="text-center">
-                  <FileText className="h-12 w-12 mx-auto mb-4 opacity-50" />
-                  <p className="text-lg font-medium mb-2">No file selected</p>
-                  <p className="text-sm">Click on a text file to open it in the editor</p>
+              (
+                <div className="flex-1 flex items-center justify-center text-muted-foreground">
+                  <div className="text-center">
+                    <FileText className="h-12 w-12 mx-auto mb-4 opacity-50" />
+                    <p className="text-lg font-medium mb-2">No file selected</p>
+                    <p className="text-sm">Click on a text file to open it in the editor</p>
+                  </div>
                 </div>
-              </div>
-            ) :  //undefined
-            (
-              <div className="flex-1 flex items-center justify-center text-muted-foreground">
-                <div className="text-center">
-                  <FileText className="h-12 w-12 mx-auto mb-4 opacity-50" />
-                  <p className="text-lg font-medium mb-2 text-red-600 dark:text-red-400">File cannot be edited</p>
-                  <p className="text-sm">Click on a text file to open it in the editor</p>
+              ) :  //undefined
+              (
+                <div className="flex-1 flex items-center justify-center text-muted-foreground">
+                  <div className="text-center">
+                    <FileText className="h-12 w-12 mx-auto mb-4 opacity-50" />
+                    <p className="text-lg font-medium mb-2 text-red-600 dark:text-red-400">File cannot be edited</p>
+                    <p className="text-sm">Click on a text file to open it in the editor</p>
+                  </div>
                 </div>
-              </div>
-            ) 
+              )
           }
         </div>
       </div>

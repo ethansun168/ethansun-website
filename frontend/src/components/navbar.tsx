@@ -1,10 +1,10 @@
 import { Avatar, AvatarFallback } from "@/components/ui/avatar";
 import { Button } from "@/components/ui/button";
 import {
-    DropdownMenu,
-    DropdownMenuContent,
-    DropdownMenuItem,
-    DropdownMenuTrigger,
+  DropdownMenu,
+  DropdownMenuContent,
+  DropdownMenuItem,
+  DropdownMenuTrigger,
 } from "@/components/ui/dropdown-menu";
 import { Spinner } from '@/components/ui/shadcn-io/spinner';
 import { Sheet, SheetClose, SheetContent, SheetDescription, SheetHeader, SheetTitle, SheetTrigger } from '@/components/ui/sheet';
@@ -39,7 +39,7 @@ export default function Navbar() {
 
   const queryClient = useQueryClient();
   const navigate = useNavigate();
-  const {data: username, isLoading} = useUsername();
+  const { data: username, isLoading } = useUsername();
   async function logout() {
     try {
       await client.api.v1.logout.$get();
@@ -81,40 +81,40 @@ export default function Navbar() {
           {isLoading ? (
             <Spinner />
           ) : username ? (
-              <DropdownMenu>
-                <DropdownMenuTrigger className="cursor-pointer">
-                  <Avatar>
-                    <AvatarFallback>{username.charAt(0).toUpperCase()}</AvatarFallback>
-                  </Avatar>
-                </DropdownMenuTrigger>
-                <DropdownMenuContent align="end">
-                  <DropdownMenuItem
-                    className="cursor-pointer"
-                    onClick={() => navigate('/dashboard')}
-                  >
-                    Dashboard
-                  </DropdownMenuItem>
-                  <DropdownMenuItem
-                    className="cursor-pointer"
-                    onClick={() => navigate('/minecraft')}
-                  >
-                    Minecraft
-                  </DropdownMenuItem>
-                  <DropdownMenuItem
-                    className="cursor-pointer"
-                    onClick={logout}
-                  >
-                    Logout
-                  </DropdownMenuItem>
-                </DropdownMenuContent>
-              </DropdownMenu>
-            ) : (
-                <Link to="/login">
-                  <Button className="cursor-pointer" variant="default">
-                    Login
-                  </Button>
-                </Link>
-              )}
+            <DropdownMenu>
+              <DropdownMenuTrigger className="cursor-pointer">
+                <Avatar>
+                  <AvatarFallback>{username.charAt(0).toUpperCase()}</AvatarFallback>
+                </Avatar>
+              </DropdownMenuTrigger>
+              <DropdownMenuContent align="end">
+                <DropdownMenuItem
+                  className="cursor-pointer"
+                  onClick={() => navigate('/dashboard')}
+                >
+                  Dashboard
+                </DropdownMenuItem>
+                <DropdownMenuItem
+                  className="cursor-pointer"
+                  onClick={() => navigate('/minecraft')}
+                >
+                  Minecraft
+                </DropdownMenuItem>
+                <DropdownMenuItem
+                  className="cursor-pointer"
+                  onClick={logout}
+                >
+                  Logout
+                </DropdownMenuItem>
+              </DropdownMenuContent>
+            </DropdownMenu>
+          ) : (
+            <Link to="/login">
+              <Button className="cursor-pointer" variant="default">
+                Login
+              </Button>
+            </Link>
+          )}
 
           <Sheet>
             <SheetTrigger className="md:hidden">

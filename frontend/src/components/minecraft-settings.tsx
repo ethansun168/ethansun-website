@@ -12,9 +12,9 @@ import { Alert, AlertTitle } from "./ui/alert";
 export function MinecraftSettings() {
   const queryClient = useQueryClient();
   const [selectedVersion, setSelectedVersion] = useState("");
-  const {data: status, isLoading: statusLoading } = useQuery(createMinecraftStatusOptions());
+  const { data: status, isLoading: statusLoading } = useQuery(createMinecraftStatusOptions());
   const settingsDisabled = statusLoading || status === 'online';
-  const {data: version, isLoading: versionLoading} = useQuery({
+  const { data: version, isLoading: versionLoading } = useQuery({
     queryKey: ['version'],
     queryFn: async () => {
       const resp = await minecraftClient.api.v1.minecraft.version.$get();
@@ -27,7 +27,7 @@ export function MinecraftSettings() {
     if (version) setSelectedVersion(version);
   }, [version]);
 
-  const {data: versions, isLoading: versionsLoading} = useQuery({
+  const { data: versions, isLoading: versionsLoading } = useQuery({
     queryKey: ['versions'],
     queryFn: async () => {
       const resp = await minecraftClient.api.v1.minecraft.versions.$get();
@@ -37,8 +37,8 @@ export function MinecraftSettings() {
   })
 
   const [saveSettingsState, setSaveSettingsState] = useState<null | "success" | "error">(null);
-  const {mutateAsync: saveSettings} = useMutation({
-    mutationFn: async ({version}: {version: string}) => {
+  const { mutateAsync: saveSettings } = useMutation({
+    mutationFn: async ({ version }: { version: string }) => {
       await minecraftClient.api.v1.minecraft.version.$post({
         json: {
           version: version
@@ -60,7 +60,7 @@ export function MinecraftSettings() {
     <Card className="flex flex-col h-[calc(100vh-200px)] w-full mx-auto shadow-lg border border-gray-200 dark:border-gray-700">
       <CardHeader>
         <CardTitle className="text-xl font-mono flex items-center">
-          <Server/>
+          <Server />
           <span className="inline-block ml-2">
             Minecraft Server Settings
           </span>
@@ -68,7 +68,7 @@ export function MinecraftSettings() {
       </CardHeader>
       <CardContent>
         {
-          settingsDisabled ? 
+          settingsDisabled ?
             <Alert variant="destructive" className="inline-flex w-auto mb-6">
               <AlertCircleIcon />
               <AlertTitle>Settings disabled because server is online.</AlertTitle>
@@ -92,7 +92,7 @@ export function MinecraftSettings() {
             </CardHeader>
             <CardContent>
               {
-                versionLoading || versionsLoading ? <Spinner /> : 
+                versionLoading || versionsLoading ? <Spinner /> :
                   <Select value={selectedVersion} onValueChange={setSelectedVersion} disabled={settingsDisabled}>
                     <SelectTrigger>
                       <SelectValue />

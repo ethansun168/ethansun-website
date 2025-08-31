@@ -16,15 +16,15 @@ export function MinecraftConsole() {
   const { scrollRef, contentRef } = useStickToBottom();
 
   const queryClient = useQueryClient();
-  const {data: status, isLoading: statusLoading } = useQuery(createMinecraftStatusOptions());
+  const { data: status, isLoading: statusLoading } = useQuery(createMinecraftStatusOptions());
 
-  const {mutateAsync: handleStart} = useMutation({
+  const { mutateAsync: handleStart } = useMutation({
     mutationFn: async () => {
-      const resp = await minecraftClient.api.v1.minecraft.start.$post(); 
+      const resp = await minecraftClient.api.v1.minecraft.start.$post();
       if (!resp.ok) {
         const body = await resp.json();
         throw new Error(body.message);
-      } 
+      }
       return await resp.json();
     },
     onSuccess: () => {
@@ -36,13 +36,13 @@ export function MinecraftConsole() {
     },
   })
 
-  const {mutateAsync: handleStop} = useMutation({
+  const { mutateAsync: handleStop } = useMutation({
     mutationFn: async () => {
-      const resp = await minecraftClient.api.v1.minecraft.stop.$post(); 
+      const resp = await minecraftClient.api.v1.minecraft.stop.$post();
       if (!resp.ok) {
         const body = await resp.json();
         throw new Error(body.message);
-      } 
+      }
       return await resp.json();
     },
     onSuccess: () => {
@@ -72,7 +72,7 @@ export function MinecraftConsole() {
     <Card className="flex flex-col h-[calc(100vh-200px)] w-full mx-auto shadow-lg border border-gray-200 dark:border-gray-700">
       <CardHeader>
         <CardTitle className="text-xl font-mono">
-          Minecraft Server Output 
+          Minecraft Server Output
           {
             statusLoading ? <span className="inline-block ml-2"><Spinner className="w-4 h-4" /></span> :
               status === 'online' ? " (Online)" : " (Offline)"
@@ -89,10 +89,9 @@ export function MinecraftConsole() {
               return (
                 <div
                   key={i}
-                  className={`mb-1 p-1 rounded ${
-                    messageJSON.type === "stderr"
-                    ? " text-red-700 dark:text-red-300"
-                    : " text-gray-900 dark:text-gray-100"
+                  className={`mb-1 p-1 rounded ${messageJSON.type === "stderr"
+                      ? " text-red-700 dark:text-red-300"
+                      : " text-gray-900 dark:text-gray-100"
                     }`}
                 >
                   {messageJSON.message}
@@ -144,7 +143,7 @@ export function MinecraftConsole() {
               try {
                 await handleStop();
               }
-              catch (error){
+              catch (error) {
                 if (error instanceof TypeError) {
                   setButtonError("Error: Cannot connect to server");
                   return;
@@ -156,7 +155,7 @@ export function MinecraftConsole() {
             Stop
           </Button>
         </div>
-        {buttonError ? 
+        {buttonError ?
           (
             <div className="text-red-700 dark:text-red-300 mt-2 font-mono flex justify-center">
               {buttonError}

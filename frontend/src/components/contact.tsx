@@ -5,7 +5,6 @@ import { Textarea } from "@/components/ui/textarea";
 export function Contact() {
   return (
     <div className="bg-gray-50 dark:bg-gray-900 text-gray-900 dark:text-gray-100 min-h-screen">
-      
       <section className="flex flex-col items-center text-center py-24 px-4 bg-gradient-to-br from-purple-500 to-purple-700 dark:from-purple-800 dark:to-purple-900 text-white">
         <h1 className="text-5xl md:text-6xl font-bold mb-4">Contact Us</h1>
         <p className="text-lg md:text-xl max-w-2xl">

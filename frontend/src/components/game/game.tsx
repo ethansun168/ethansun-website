@@ -2,10 +2,10 @@ import type { UserItem } from "@/app";
 import { Button } from "@/components/ui/button";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import {
-    Sheet,
-    SheetContent,
-    SheetHeader,
-    SheetTitle
+  Sheet,
+  SheetContent,
+  SheetHeader,
+  SheetTitle
 } from "@/components/ui/sheet";
 import { Settings } from "lucide-react";
 import { useState } from "react";
@@ -84,7 +84,7 @@ export function Game({ points, setPoints, setItems }: GameProps) {
     >
       <div className="self-end cursor-pointer">
         {
-          isAdmin ? <Settings onClick={() => setSheetOpen(true)}/> : null
+          isAdmin ? <Settings onClick={() => setSheetOpen(true)} /> : null
         }
       </div>
       <Sheet open={sheetOpen} onOpenChange={setSheetOpen}>
@@ -149,7 +149,7 @@ export function Game({ points, setPoints, setItems }: GameProps) {
             </Button>
             <Button
               onClick={() => navigate("/shop")}
-              className="bg-blue-600 text-white hover:bg-blue-500" 
+              className="bg-blue-600 text-white hover:bg-blue-500"
             >
               🛒 Go to Shop
             </Button>
@@ -164,7 +164,7 @@ export function Game({ points, setPoints, setItems }: GameProps) {
             <Input
               placeholder="Enter an amount"
               value={gambleInput}
-              onChange={(e) => setGambleInput(e.target.value)} 
+              onChange={(e) => setGambleInput(e.target.value)}
               className={`rounded-l-lg flex-1 mr-4 ${gambleError ? "border-red-600" : ""}`}
             />
             <Button className="rounded-r-lg bg-green-600 text-white hover:bg-green-500" type="submit">

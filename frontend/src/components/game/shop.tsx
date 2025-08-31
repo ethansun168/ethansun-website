@@ -6,6 +6,13 @@ import { Button } from "@/components/ui/button";
 import { Card, CardContent, CardFooter, CardHeader, CardTitle } from "@/components/ui/card";
 import { useState } from "react";
 import { useNavigate } from "react-router-dom";
+import {
+  DropdownMenu,
+  DropdownMenuContent,
+  DropdownMenuItem,
+  DropdownMenuTrigger,
+} from "@/components/ui/dropdown-menu"
+import { MoreVertical } from "lucide-react";
 
 type Product = {
   id: number;
@@ -17,7 +24,7 @@ type Product = {
 };
 
 const products: Product[] = [
-  { id: 1, name: "Cursor", price: 5, sellPrice: 1, image: cursorPlus, darkImage: cursorPlusDark},
+  { id: 1, name: "Cursor", price: 5, sellPrice: 1, image: cursorPlus, darkImage: cursorPlusDark },
   { id: 2, name: "Red Pikmin", price: 10, sellPrice: 2, image: redPikmin, darkImage: redPikmin },
 ];
 
@@ -25,7 +32,7 @@ interface ShopProps {
   points: number;
   setPoints: React.Dispatch<React.SetStateAction<number>>;
   items: UserItem[],
-  setItems: React.Dispatch<React.SetStateAction<UserItem[]>>; 
+  setItems: React.Dispatch<React.SetStateAction<UserItem[]>>;
 }
 
 export function Shop({ points, setPoints, items, setItems }: ShopProps) {
@@ -40,7 +47,7 @@ export function Shop({ points, setPoints, items, setItems }: ShopProps) {
         const existingItem = prev.find((item) => item.id === product.id);
         if (existingItem) {
           return prev.map((item) => (
-            item.id === product.id ? {...item, count: item.count + 1} : item
+            item.id === product.id ? { ...item, count: item.count + 1 } : item
           ))
         }
         else {
@@ -62,7 +69,7 @@ export function Shop({ points, setPoints, items, setItems }: ShopProps) {
     else {
       setItems((prev) => (
         prev.map((item) => (
-          item.id === id ? {...item, count: item.count - amount} : item
+          item.id === id ? { ...item, count: item.count - amount } : item
         ))
       ))
     }
@@ -82,7 +89,7 @@ export function Shop({ points, setPoints, items, setItems }: ShopProps) {
           className="bg-blue-600 text-white hover:bg-blue-500"
         >
           Back to Game
-        </Button>      
+        </Button>
         <p className="text-lg font-semibold text-gray-700 dark:text-gray-300">
           Points: <span className="text-yellow-500 dark:text-yellow-400">{points}</span>
         </p>
@@ -125,11 +132,10 @@ export function Shop({ points, setPoints, items, setItems }: ShopProps) {
               <Button
                 onClick={() => handleBuy(product)}
                 disabled={points < product.price}
-                className={`w-full font-semibold ${
-                  points < product.price
+                className={`w-full font-semibold ${points < product.price
                     ? "bg-gray-400 text-gray-800 dark:bg-gray-600 dark:text-gray-300 cursor-not-allowed"
                     : "bg-blue-600 hover:bg-blue-500 text-white"
-                }`}
+                  }`}
               >
                 {points < product.price ? "Too Expensive" : "Buy"}
               </Button>
@@ -144,28 +150,40 @@ export function Shop({ points, setPoints, items, setItems }: ShopProps) {
           <p className="text-gray-600 dark:text-gray-400">You don't own anything yet.</p>
         ) : (
           <ul className="space-y-2">
-              {items.map((item) => {
-                const product = products.find((p) => p.id === item.id)!;
-                return (
-                  <li
-                    key={product.id}
-                    className="flex justify-between bg-white dark:bg-gray-800 p-3 rounded-lg shadow items-center"
-                  >
-                    <span className="text-gray-800 dark:text-white">
-                      {product.name} 
-                    </span>
-                    <span className="text-gray-600 font-bold dark:text-gray-300">
-                      <Button className="mr-2 cursor-pointer" variant="destructive" onClick={() => sell(product.id, 1)}>
-                        Sell x1 ({product.sellPrice} pts)
-                      </Button>
-                      <Button className="mr-2 cursor-pointer" variant="destructive" onClick={() => sell(product.id, item.count)}>
-                        Sell All ({product.sellPrice * item.count} pts)
-                      </Button>
-                      (x{item.count})
-                    </span>
-                  </li>
-                )
-              })}
+            {items.map((item) => {
+              const product = products.find((p) => p.id === item.id)!;
+              return (
+                <li
+                  key={product.id}
+                  className="flex justify-between bg-white dark:bg-gray-800 p-3 rounded-lg shadow items-center"
+                >
+                  <span className="text-gray-800 dark:text-white">
+                    {product.name}
+                  </span>
+
+                  <div className="flex items-center gap-2 text-gray-600 font-bold dark:text-gray-300">
+                    (x{item.count})
+                    <DropdownMenu>
+                      <DropdownMenuTrigger asChild>
+                        <Button variant="destructive" size="icon" className="cursor-pointer">
+                          <MoreVertical className="w-4 h-4" />
+                        </Button>
+                      </DropdownMenuTrigger>
+                      <DropdownMenuContent align="end">
+                        <DropdownMenuItem className="cursor-pointer" onClick={() => sell(product.id, 1)}>
+                          Sell x1 ({product.sellPrice} pts)
+                        </DropdownMenuItem>
+                        <DropdownMenuItem className="cursor-pointer" onClick={() => sell(product.id, item.count)}>
+                          Sell All ({product.sellPrice * item.count} pts)
+                        </DropdownMenuItem>
+                      </DropdownMenuContent>
+                    </DropdownMenu>
+
+                  </div>
+                </li>
+
+              )
+            })}
           </ul>
         )}
       </div>

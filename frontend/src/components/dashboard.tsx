@@ -6,13 +6,13 @@ import { useQuery } from '@tanstack/react-query';
 import { Progress } from "./ui/progress";
 
 export function Dashboard() {
-  const {username, isLoading} = useRequireAuth();
-  const {data: systemData} = useQuery({
+  const { username, isLoading } = useRequireAuth();
+  const { data: systemData } = useQuery({
     queryKey: ['system-status'],
     queryFn: async () => {
       const resp = await client.api.v1.dashboard.$get();
       if (!resp.ok) throw new Error("Error occurred");
-      return await resp.json();   
+      return await resp.json();
     },
     refetchInterval: 1000
   })
