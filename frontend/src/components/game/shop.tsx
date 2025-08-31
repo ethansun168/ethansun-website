@@ -2,6 +2,8 @@ import type { UserItem } from "@/app";
 import cursorPlus from "@/assets/cursor-plus.svg";
 import cursorPlusDark from "@/assets/cursor-plus-dark.png";
 import redPikmin from "@/assets/red-pikmin.png";
+import bluePikmin from "@/assets/blue-pikmin.png";
+import yellowPikmin from "@/assets/yellow-pikmin.png";
 import { Button } from "@/components/ui/button";
 import { Card, CardContent, CardFooter, CardHeader, CardTitle } from "@/components/ui/card";
 import { useState } from "react";
@@ -26,6 +28,8 @@ type Product = {
 const products: Product[] = [
   { id: 1, name: "Cursor", price: 5, sellPrice: 1, image: cursorPlus, darkImage: cursorPlusDark },
   { id: 2, name: "Red Pikmin", price: 10, sellPrice: 2, image: redPikmin, darkImage: redPikmin },
+  { id: 3, name: "Blue Pikmin", price: 15, sellPrice: 4, image: bluePikmin, darkImage: bluePikmin },
+  { id: 4, name: "Yellow Pikmin", price: 20, sellPrice: 5, image: yellowPikmin, darkImage: yellowPikmin },
 ];
 
 interface ShopProps {
@@ -36,7 +40,6 @@ interface ShopProps {
 }
 
 export function Shop({ points, setPoints, items, setItems }: ShopProps) {
-
   const [error, setError] = useState<string | null>(null);
   const navigate = useNavigate();
 
@@ -114,12 +117,12 @@ export function Shop({ points, setPoints, items, setItems }: ShopProps) {
               <img
                 src={product.image}
                 alt={product.name}
-                className="w-40 h-40 object-cover rounded-lg dark:hidden"
+                className="w-40 h-40 object-contain rounded-lg dark:hidden"
               />
               <img
                 src={product.darkImage}
                 alt={product.name}
-                className="w-40 h-40 object-cover rounded-lg hidden dark:block"
+                className="w-40 h-40 object-contain rounded-lg hidden dark:block"
               />
             </CardContent>
             <CardFooter className="flex flex-col items-center gap-2">

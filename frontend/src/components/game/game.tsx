@@ -2,10 +2,10 @@ import type { UserItem } from "@/app";
 import { Button } from "@/components/ui/button";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import {
-  Sheet,
-  SheetContent,
-  SheetHeader,
-  SheetTitle
+    Sheet,
+    SheetContent,
+    SheetHeader,
+    SheetTitle
 } from "@/components/ui/sheet";
 import { Settings } from "lucide-react";
 import { useState } from "react";
@@ -19,12 +19,14 @@ interface GameProps {
   setItems: React.Dispatch<React.SetStateAction<UserItem[]>>;
 }
 
-export function Game({ points, setPoints, setItems }: GameProps) {
+export function Game({ points, setPoints, setItems, items }: GameProps) {
   const navigate = useNavigate();
   const [gambleInput, setGambleInput] = useState("");
   const [gambleOutput, setGambleOutput] = useState("");
   const [gambleError, setGambleError] = useState(false);
   const [isAdmin, setIsAdmin] = useState(false);
+
+  const cursorAmount = items.find((item) => item.id === 1)?.count ?? 0;
 
   function validateInput(input: string) {
     const n = Number(input);
@@ -142,7 +144,7 @@ export function Game({ points, setPoints, setItems }: GameProps) {
             </div>
 
             <Button
-              onClick={() => setPoints((prev) => prev + 1)}
+              onClick={() => setPoints((prev) => prev + cursorAmount + 1)}
               className="px-6 py-3 text-lg rounded-full bg-yellow-400 text-black font-bold shadow-md hover:bg-yellow-300 dark:shadow-lg dark:hover:bg-yellow-300 hover:scale-105 transition-transform duration-200"
             >
               Click Me
