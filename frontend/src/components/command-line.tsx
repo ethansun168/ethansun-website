@@ -8,11 +8,109 @@ type LogEntry = {
 type CommandConfig = {
   fn: (args: string[]) =>
     LogEntry |
-    Generator<LogEntry, void, unknown> |
-    AsyncGenerator<LogEntry, void, unknown> |
+    Generator<LogEntry, void, string> |
+    AsyncGenerator<LogEntry, void, string> |
     null;
   description: string;
+  type: 'shell' | 'file' | 'game';
 }
+
+// File System stuff
+type NodeType = 'file' | 'directory';
+interface BaseNode {
+  id: string;
+  name: string;
+  parentID: string | null;
+  type: NodeType;
+  createdAt: number;
+}
+
+interface FileNode extends BaseNode {
+  type: 'file';
+  content: string;
+}
+
+interface DirectoryNode extends BaseNode {
+  type: 'directory';
+  children: string[];
+}
+type FileSystemNode = FileNode | DirectoryNode;
+
+const initFileSystem: Map<string, FileSystemNode> = new Map([
+  ['root', {
+    id: 'root',
+    name: '/',
+    parentID: null,
+    type: 'directory',
+    children: ['bin', 'etc', 'home', 'var', 'file'],
+    createdAt: Date.now(),
+  }],
+  ['bin', {
+    id: 'bin',
+    name: 'bin',
+    parentID: 'root',
+    type: 'directory',
+    children: ['sh'],
+    createdAt: Date.now(),
+  }],
+  ['sh', {
+    id: 'sh',
+    name: 'sh',
+    parentID: 'bin',
+    type: 'file',
+    content: '#!/bin/sh\necho "Shell initialized."',
+    createdAt: Date.now(),
+  }],
+  ['etc', {
+    id: 'etc',
+    name: 'etc',
+    parentID: 'root',
+    type: 'directory',
+    children: ['hostname'],
+    createdAt: Date.now(),
+  }],
+  ['hostname', {
+    id: 'hostname',
+    name: 'hostname',
+    parentID: 'etc',
+    type: 'file',
+    content: 'v-linux-web-01',
+    createdAt: Date.now(),
+  }],
+  ['home', {
+    id: 'home',
+    name: 'home',
+    parentID: 'root',
+    type: 'directory',
+    children: ['user'],
+    createdAt: Date.now(),
+  }],
+  ['user', {
+    id: 'user',
+    name: 'user',
+    parentID: 'home',
+    type: 'directory',
+    children: [],
+    createdAt: Date.now(),
+  }],
+  ['var', {
+    id: 'var',
+    name: 'var',
+    parentID: 'root',
+    type: 'directory',
+    children: [],
+    createdAt: Date.now(),
+  }],
+  ['file', {
+    id: 'file',
+    name: 'file',
+    content: "imma file\n newline",
+    parentID: 'root',
+    type: 'file',
+    children: [],
+    createdAt: Date.now()
+  }]
+]);
 
 export function CommandLine() {
   const COMMANDS: Record<string, CommandConfig> = {
@@ -21,50 +119,50 @@ export function CommandLine() {
         type: 'system',
         text: generateHelpText()
       }),
-      description: 'Display this help menu'
+      description: 'Display this help menu',
+      type: 'shell'
     },
     about: {
       fn: () => ({
         type: 'system',
         text: 'Mirtsema Terminal'
       }),
-      description: 'Learn more about this terminal'
-    },
-    ls: {
-      fn: () => ({
-        type: 'system',
-        text: `projects.txt  resume.pdf  contact.sh`
-      }),
-      description: 'List directory contents'
+      description: 'Learn more about this terminal',
+      type: 'shell'
     },
     clear: {
       fn: () => null,
-      description: 'Clear the terminal screen'
+      description: 'Clear the terminal screen',
+      type: 'shell'
     },
     exit: {
       fn: () => null,
-      description: 'Terminate the current session'
+      description: 'Terminate the current session',
+      type: 'shell'
     },
     sudo: {
       fn: () => ({
         type: 'error',
         text: 'User is not in the sudoers file. This incident will be reported.'
       }),
-      description: "Execute a command as another user"
+      description: "Execute a command as another user",
+      type: 'shell'
     },
     history: {
       fn: () => ({
         type: 'system',
         text: generateHistoryText(commandHistory)
       }),
-      description: 'List all commands typed in this session'
+      description: 'List all commands typed in this session',
+      type: 'shell'
     },
     whoami: {
       fn: () => ({
         type: 'system',
         text: username
       }),
-      description: 'Print effective user name'
+      description: 'Print effective user name',
+      type: 'shell'
     },
     login: {
       fn: async function* () {
@@ -80,7 +178,8 @@ export function CommandLine() {
           yield { type: "error", text: "Invalid credentials." };
         }
       },
-      description: "Log into the system"
+      description: "Log into the system",
+      type: 'shell'
     },
     game: {
       fn: async function* () {
@@ -168,29 +267,192 @@ choice: `
           }
         }
       },
-      description: 'Play a game'
+      description: 'Play a game',
+      type: 'game'
     },
     bal: {
       fn: () => ({
         type: 'system',
         text: `You currently have: ${coins} ${coins == 1 ? "coin" : "coins"}.`
       }),
-      description: "Check your balance"
+      description: "Check your balance",
+      type: 'game'
+    },
+    ls: {
+      fn: () => ({
+        type: 'system',
+        text: getFiles(dirID)
+          .sort((a, b) => {
+            if (a.type !== b.type) {
+              return a.type === 'directory' ? -1 : 1;
+            }
+            return a.name.localeCompare(b.name)
+          })
+          .map((file) => {
+            let name = file.name;
+            if (file.type === 'directory') {
+              name += '/';
+            }
+            const dateString = new Date(file.createdAt).toLocaleDateString('en-GB', {
+              day: '2-digit',
+              month: 'short',
+              hour: '2-digit',
+              minute: '2-digit'
+            });
+            return `${name.padEnd(10)} ${dateString}`;
+          })
+          .join("\n"),
+      }),
+      description: 'List directory contents',
+      type: 'file'
+    },
+    cat: {
+      fn: (args) => {
+        if (args.length === 0) {
+          return { type: 'error', text: "cat: usage: cat <filename>" };
+        }
+        const childID = getIDInDirectory(args[0]);
+        if (!childID) {
+          return { type: 'error', text: `cat: ${args[0]} does not exist.` };
+        }
+        const file = files.get(childID);
+        if (!file) {
+          return { type: 'error', text: `cat: ${args[0]} does not exist.` };
+        }
+        if (file.type === 'directory') {
+          return { type: 'error', text: `cat: ${file.name} is a directory.` };
+        }
+        return { type: 'system', text: file.content };
+      },
+      description: "Print file contents to screen",
+      type: 'file'
+    },
+    touch: {
+      fn: (args) => {
+        if (args.length === 0) {
+          return { type: 'error', text: "touch: usage: touch <filename>" };
+        }
+        const childID = getIDInDirectory(args[0]);
+        if (childID) {
+          return { type: 'error', text: `touch: ${args[0]} already exists.` };
+        }
+        createFile(args[0]);
+        return { type: 'system', text: '' };
+      },
+      description: "Create a file",
+      type: 'file'
+    },
+    mkdir: {
+      fn: (args) => {
+        if (args.length === 0) {
+          return { type: 'error', text: "mkdir: usage: mkdir <dirname>" };
+        }
+        const childID = getIDInDirectory(args[0]);
+        if (childID) {
+          return { type: 'error', text: `mkdir: ${args[0]} already exists.` };
+        }
+        createDirectory(args[0]);
+        return { type: 'system', text: '' };
+      },
+      description: "Make directories",
+      type: 'file'
+    },
+    cd: {
+      fn: (args) => {
+        if (args.length === 0) {
+          return { type: 'error', text: "cd: usage: cd <dirname>" };
+        }
+        if (args[0] === "..") {
+          // move up
+          const dir = files.get(dirID);
+          if (!dir) {
+            return { type: 'error', text: `cd: Not in a directory` };
+          }
+          if (dir.parentID) {
+            setDirID(dir.parentID);
+          }
+          return { type: 'system', text: '' };
+        }
+        else if (args[0] === '~') {
+          setDirID('home');
+          return { type: 'system', text: '' };
+        }
+        else if (args[0] === '/') {
+          setDirID('root')
+          return { type: 'system', text: '' };
+        }
+
+        const childID = getIDInDirectory(args[0]);
+        if (!childID) {
+          return { type: 'error', text: `cd: ${args[0]} does not exist.` };
+        }
+        const dir = files.get(childID);
+        if (!dir) {
+          return { type: 'error', text: `cd: ${args[0]} does not exist.` };
+        }
+        if (dir.type === 'file') {
+          return { type: 'error', text: `cd: ${dir.name} is a file.` };
+        }
+        setDirID(dir.id);
+        return { type: 'system', text: '' };
+      },
+      description: 'Change directories',
+      type: 'file'
+    },
+    vi: {
+      fn: async function* (args) {
+        if (args.length === 0) {
+          yield { type: 'error', text: 'vi: usage: vi <filename>' };
+          return;
+        }
+        const fileID = getIDInDirectory(args[0]);
+        const file = fileID ? files.get(fileID) : null;
+
+        if (file && file.type === 'directory') {
+          yield { type: 'error', text: 'vi: cannot edit directory' };
+          return;
+        }
+
+        yield { type: 'system', text: `--- EDITING ${args[0]} ---` };
+
+        if (file) {
+          setInput(file.content);
+        }
+        const newContent = yield { type: 'prompt', text: 'NEW CONTENT: ' };
+        const choice = yield { type: 'prompt', text: 'Save changes? (y/n): ' };
+
+        if (choice.toLowerCase() === 'y') {
+          if (fileID) {
+            const newFiles = new Map(files);
+            newFiles.set(fileID, { ...file, content: newContent } as FileNode);
+            setFiles(newFiles);
+          } else {
+            createFile(args[0], newContent);
+          }
+          yield { type: 'system', text: 'File saved.' };
+        }
+      },
+      description: 'Edit a file',
+      type: 'file'
     }
   };
 
   const [coins, setCoins] = useState(0);
 
-  const generateHelpText = () => {
-    const header = "AVAILABLE COMMANDS:\n-------------------\n";
-
-    const body = Object.entries(COMMANDS)
-      .map(([name, config]) => {
-        return `${name.padEnd(12)} - ${config.description}`;
-      })
-      .join('\n');
-
-    return header + body;
+  const generateHelpText = (): string => {
+    const getCommandGroup = (type: typeof COMMANDS[keyof typeof COMMANDS]['type']) => {
+      const header = `${type.toUpperCase()} COMMANDS:\n-------------------\n`;
+      const footer = "-------------------\n";
+      const body = Object.entries(COMMANDS)
+        .filter(([, config]) => config.type === type)
+        .map(([name, config]) => {
+          return `${name.padEnd(12)} - ${config.description}`;
+        })
+        .join('\n') + '\n';
+      return header + body + footer;
+    }
+    const types = [...new Set(Object.values(COMMANDS).map(c => c.type))];
+    return types.map(type => getCommandGroup(type)).join('')
   };
 
   const generateHistoryText = (history: string[]) => {
@@ -217,8 +479,87 @@ choice: `
   const activeGeneratorRef = useRef<AsyncGenerator<LogEntry, void, string> | null>(null);
   const [activePrompt, setActivePrompt] = useState<string | null>(null);
 
+  const [dirID, setDirID] = useState("home");
+  const [files, setFiles] = useState(initFileSystem);
+
+  function createFile(name: string, content: string = "") {
+    const parent = files.get(dirID);
+    if (!parent || parent.type !== 'directory') throw new Error("Invalid parent");
+    const id = Math.random().toString(36).substr(2, 9);
+    const newFile: FileNode = {
+      id,
+      name,
+      parentID: dirID,
+      type: 'file',
+      content,
+      createdAt: Date.now()
+    }
+    const newFiles = new Map(files);
+    newFiles.set(id, newFile);
+    newFiles.set(dirID, {
+      ...parent,
+      children: [...parent.children, id]
+    })
+    setFiles(newFiles);
+    return id;
+  }
+
+  function createDirectory(name: string) {
+    const parent = files.get(dirID);
+    if (!parent || parent.type !== 'directory') throw new Error("Invalid parent");
+    const id = Math.random().toString(36).substr(2, 9);
+    const newDir: DirectoryNode = {
+      id,
+      name,
+      parentID: dirID,
+      type: 'directory',
+      children: [],
+      createdAt: Date.now()
+    }
+    const newFiles = new Map(files);
+    newFiles.set(id, newDir);
+    newFiles.set(dirID, {
+      ...parent,
+      children: [...parent.children, id]
+    })
+    setFiles(newFiles);
+  }
+
+  function getPath(nodeID: string): string {
+    const file = files.get(nodeID);
+    if (!file || !file.parentID) return file?.name || "";
+    const fullPath = `${getPath(file.parentID)}/${file.name}`.replace('//', '/');
+    if (fullPath.startsWith("/home")) {
+      return "~" + fullPath.slice(5);
+    }
+    return fullPath;
+  }
+
+  // Get all files at this directory
+  function getFiles(dirID: string) {
+    const folder = files.get(dirID);
+    if (!folder || folder.type != 'directory') {
+      return [];
+    }
+    return folder.children
+      .map(childID => files.get(childID))
+      .filter((node): node is FileSystemNode => node !== undefined);
+  }
+
+  function getIDInDirectory(name: string) {
+    const dirNode = files.get(dirID);
+    if (!dirNode || dirNode.type !== 'directory') {
+      return undefined;
+    }
+    const childID = dirNode.children.find(id => {
+      const childNode = files.get(id);
+      return childNode?.name === name;
+    })
+    return childID;
+  }
+
   const [username, setUsername] = useState("user")
-  const userPrefix = username + "@dev:~$";
+  const userPrefix = username + "@dev:" + getPath(dirID) + "$";
 
   function forceFocus() {
     if (inputRef.current) inputRef.current.focus();
@@ -263,7 +604,7 @@ choice: `
         const [command, ...args] = userInput.toLowerCase().split(' ');
         if (!command) { setIsExecuting(false); return; }
 
-        setHistory(prev => [...prev, { type: 'user', text: userInput }]);
+        setHistory(prev => [...prev, { type: 'user', text: userPrefix + " " + userInput }]);
 
         if (commandHistory[0] !== userInput) {
           setCommandHistory(prev => [userInput, ...prev]);
@@ -376,7 +717,6 @@ choice: `
                   ${line.type === 'system' ? 'opacity-70 italic' : ''}
                   ${line.type === 'error' ? 'text-red-600 dark:text-red-400 font-bold' : ''}
                 `}>
-                  {line.type === 'user' && <span className="mr-2">{userPrefix}</span>}
                   {line.text}
                 </span>
               </div>
