@@ -18,6 +18,7 @@ import { ModeToggle } from "./mode-toggle";
 const navLinks = [
   { name: 'Home', to: '/' },
   { name: 'Game', to: '/game' },
+  { name: 'Command Line', to: '/command' },
   { name: 'About', to: '/about' },
   { name: 'Contact', to: '/contact' },
 ];

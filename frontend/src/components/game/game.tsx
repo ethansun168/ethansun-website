@@ -41,7 +41,7 @@ export function Game({ points, setPoints, setItems, items }: GameProps) {
   }
 
   function gambleN(amount: number) {
-    if (Math.random() > 0.5) {
+    if (Math.random() >= 0.5) {
       // win
       setPoints(prev => prev + amount);
       setGambleOutput("You won!");

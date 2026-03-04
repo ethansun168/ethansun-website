@@ -4,6 +4,8 @@ import cursorPlusDark from "@/assets/cursor-plus-dark.png";
 import redPikmin from "@/assets/red-pikmin.png";
 import bluePikmin from "@/assets/blue-pikmin.png";
 import yellowPikmin from "@/assets/yellow-pikmin.png";
+import pinkPikmin from "@/assets/pink-pikmin.png";
+import rockPikmin from "@/assets/rock-pikmin.png";
 import { Button } from "@/components/ui/button";
 import { Card, CardContent, CardFooter, CardHeader, CardTitle } from "@/components/ui/card";
 import { useState } from "react";
@@ -30,6 +32,8 @@ const products: Product[] = [
   { id: 2, name: "Red Pikmin", price: 10, sellPrice: 2, image: redPikmin, darkImage: redPikmin },
   { id: 3, name: "Blue Pikmin", price: 15, sellPrice: 4, image: bluePikmin, darkImage: bluePikmin },
   { id: 4, name: "Yellow Pikmin", price: 20, sellPrice: 5, image: yellowPikmin, darkImage: yellowPikmin },
+  { id: 5, name: "Pink Pikmin", price: 25, sellPrice: 6, image: pinkPikmin, darkImage: pinkPikmin },
+  { id: 6, name: "Rock Pikmin", price: 100, sellPrice: 7, image: rockPikmin, darkImage: rockPikmin },
 ];
 
 interface ShopProps {

@@ -11,6 +11,7 @@ import Navbar from './components/navbar';
 import { NotFound } from './components/not-found';
 import { ThemeProvider } from './components/theme-provider';
 import { Contact } from './components/contact';
+import { CommandLine } from './components/command-line';
 
 export type UserItem = {
   id: number,
@@ -51,6 +52,7 @@ function App() {
         <Route path="/minecraft" element={<Minecraft />} />
         <Route path="/game" element={<Game points={points} setPoints={setPoints} items={items} setItems={setItems} />} />
         <Route path="/shop" element={<Shop points={points} setPoints={setPoints} items={items} setItems={setItems} />} />
+        <Route path="/command" element={<CommandLine />} />
         <Route path="*" element={<NotFound />} />
       </Routes>
     </ThemeProvider>

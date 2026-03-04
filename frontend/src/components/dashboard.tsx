@@ -16,7 +16,7 @@ export function Dashboard() {
     },
     refetchInterval: 1000
   })
-  if (!username || !systemData || isLoading) return null;
+  if (!username || !systemData || isLoading) return "Logging in...";
 
   return (
     <div className="w-full">
