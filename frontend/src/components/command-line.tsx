@@ -291,30 +291,45 @@ choice: `
       type: 'game'
     },
     ls: {
-      fn: () => ({
-        type: 'system',
-        text: getFiles(dirID)
-          .sort((a, b) => {
-            if (a.type !== b.type) {
-              return a.type === 'directory' ? -1 : 1;
+      fn: (args) => {
+        try {
+          return {
+            type: 'system',
+            text: getFiles(args.length === 0 ? "." : args[0])
+              .sort((a, b) => {
+                if (a.type !== b.type) {
+                  return a.type === 'directory' ? -1 : 1;
+                }
+                return a.name.localeCompare(b.name)
+              })
+              .map((file) => {
+                let name = file.name;
+                if (file.type === 'directory') {
+                  name += '/';
+                }
+                const dateString = new Date(file.createdAt).toLocaleDateString('en-GB', {
+                  day: '2-digit',
+                  month: 'short',
+                  hour: '2-digit',
+                  minute: '2-digit'
+                });
+                return `${name.padEnd(10)} ${dateString}`;
+              })
+              .join("\n")
+          }
+        } catch (e) {
+          if (e instanceof Error) {
+            return {
+              type: 'error',
+              text: e.message
             }
-            return a.name.localeCompare(b.name)
-          })
-          .map((file) => {
-            let name = file.name;
-            if (file.type === 'directory') {
-              name += '/';
-            }
-            const dateString = new Date(file.createdAt).toLocaleDateString('en-GB', {
-              day: '2-digit',
-              month: 'short',
-              hour: '2-digit',
-              minute: '2-digit'
-            });
-            return `${name.padEnd(10)} ${dateString}`;
-          })
-          .join("\n"),
-      }),
+          }
+        }
+        return {
+          type: 'error',
+          text: "Unexpected Error"
+        }
+      },
       description: 'List directory contents',
       type: 'file'
     },
@@ -396,8 +411,22 @@ choice: `
         else if (file.type === 'directory') {
           return { type: 'error', text: `cd: ${file.name} is a directory.` };
         }
-        removeFile(args[0]);
-        return { type: 'system', text: '' };
+        try {
+          removeFile(args[0]);
+          return { type: 'system', text: '' };
+        }
+        catch (e) {
+          if (e instanceof Error) {
+            return {
+              type: 'error',
+              text: e.message
+            }
+          }
+        }
+        return {
+          type: 'error',
+          text: "Unexpected Error"
+        }
       },
       description: "Remove a file",
       type: 'file'
@@ -545,7 +574,6 @@ choice: `
     setFiles(newFiles);
   }
 
-
   function getPath(nodeID: string): string {
     const file = files.get(nodeID);
     if (!file || !file.parentID) return file?.name || "";
@@ -557,12 +585,13 @@ choice: `
   }
 
   // Get all files at this directory
-  function getFiles(dirID: string) {
-    const folder = files.get(dirID);
-    if (!folder || folder.type != 'directory') {
-      return [];
+  function getFiles(dirName: string) {
+    const dir = fileExists(dirName);
+    if (!dir) {
+      throw new Error(`${dirName} doesn't exist.`);
     }
-    return folder.children
+    else if (dir.type !== 'directory') throw new Error(`${dirName} is not a directory.`);
+    return dir.children
       .map(childID => files.get(childID))
       .filter((node): node is FileSystemNode => node !== undefined);
   }
@@ -582,6 +611,9 @@ choice: `
     }
     else if (name == "~") {
       return "home";
+    }
+    else if (name == ".") {
+      return dirID;
     }
 
     const dirNode = files.get(dirID);
