@@ -90,8 +90,29 @@ const initFileSystem: Map<string, FileSystemNode> = new Map([
     name: 'user',
     parentID: 'home',
     type: 'directory',
-    children: [],
+    children: ["bashrc"],
     createdAt: Date.now(),
+  }],
+  ['bashrc', {
+    id: 'bashrc',
+    name: '.bashrc',
+    parentID: 'user',
+    type: 'file',
+    content: `alias ls='ls --color=auto'
+alias ll='ls -alF'
+alias la='ls -A'
+alias l='ls -CF'
+alias ..='cd ..'
+alias ...='cd ../..'
+export HISTCONTROL=ignoreboth
+export HISTSIZE=1000
+export HISTFILESIZE=2000
+
+export EDITOR='vi'
+
+echo "Mirtsema Linux 1.0.4-LTS (GNU/Linux 5.15.0-generic x86_64)"
+echo "Type 'help' to see available commands."`,
+    createdAt: Date.now()
   }],
   ['var', {
     id: 'var',
@@ -101,15 +122,6 @@ const initFileSystem: Map<string, FileSystemNode> = new Map([
     children: [],
     createdAt: Date.now(),
   }],
-  ['file', {
-    id: 'file',
-    name: 'file',
-    content: "imma file\n newline",
-    parentID: 'root',
-    type: 'file',
-    children: [],
-    createdAt: Date.now()
-  }]
 ]);
 
 export function CommandLine() {
@@ -311,15 +323,11 @@ choice: `
         if (args.length === 0) {
           return { type: 'error', text: "cat: usage: cat <filename>" };
         }
-        const childID = getIDInDirectory(args[0]);
-        if (!childID) {
-          return { type: 'error', text: `cat: ${args[0]} does not exist.` };
-        }
-        const file = files.get(childID);
+        const file = fileExists(args[0]);
         if (!file) {
           return { type: 'error', text: `cat: ${args[0]} does not exist.` };
         }
-        if (file.type === 'directory') {
+        else if (file.type === 'directory') {
           return { type: 'error', text: `cat: ${file.name} is a directory.` };
         }
         return { type: 'system', text: file.content };
@@ -332,8 +340,8 @@ choice: `
         if (args.length === 0) {
           return { type: 'error', text: "touch: usage: touch <filename>" };
         }
-        const childID = getIDInDirectory(args[0]);
-        if (childID) {
+        const file = fileExists(args[0]);
+        if (file) {
           return { type: 'error', text: `touch: ${args[0]} already exists.` };
         }
         createFile(args[0]);
@@ -347,9 +355,9 @@ choice: `
         if (args.length === 0) {
           return { type: 'error', text: "mkdir: usage: mkdir <dirname>" };
         }
-        const childID = getIDInDirectory(args[0]);
-        if (childID) {
-          return { type: 'error', text: `mkdir: ${args[0]} already exists.` };
+        const file = fileExists(args[0]);
+        if (file) {
+          return { type: 'error', text: `touch: ${args[0]} already exists.` };
         }
         createDirectory(args[0]);
         return { type: 'system', text: '' };
@@ -362,41 +370,36 @@ choice: `
         if (args.length === 0) {
           return { type: 'error', text: "cd: usage: cd <dirname>" };
         }
-        if (args[0] === "..") {
-          // move up
-          const dir = files.get(dirID);
-          if (!dir) {
-            return { type: 'error', text: `cd: Not in a directory` };
-          }
-          if (dir.parentID) {
-            setDirID(dir.parentID);
-          }
-          return { type: 'system', text: '' };
-        }
-        else if (args[0] === '~') {
-          setDirID('home');
-          return { type: 'system', text: '' };
-        }
-        else if (args[0] === '/') {
-          setDirID('root')
-          return { type: 'system', text: '' };
-        }
 
-        const childID = getIDInDirectory(args[0]);
-        if (!childID) {
-          return { type: 'error', text: `cd: ${args[0]} does not exist.` };
-        }
-        const dir = files.get(childID);
+        const dir = fileExists(args[0]);
         if (!dir) {
           return { type: 'error', text: `cd: ${args[0]} does not exist.` };
         }
-        if (dir.type === 'file') {
+        else if (dir.type === 'file') {
           return { type: 'error', text: `cd: ${dir.name} is a file.` };
         }
         setDirID(dir.id);
         return { type: 'system', text: '' };
       },
       description: 'Change directories',
+      type: 'file'
+    },
+    rm: {
+      fn: (args) => {
+        if (args.length === 0) {
+          return { type: 'error', text: "rm: usage: rm <filename>" };
+        }
+        const file = fileExists(args[0]);
+        if (!file) {
+          return { type: 'error', text: `cd: ${args[0]} does not exist.` };
+        }
+        else if (file.type === 'directory') {
+          return { type: 'error', text: `cd: ${file.name} is a directory.` };
+        }
+        removeFile(args[0]);
+        return { type: 'system', text: '' };
+      },
+      description: "Remove a file",
       type: 'file'
     },
     vi: {
@@ -525,6 +528,24 @@ choice: `
     setFiles(newFiles);
   }
 
+  // Remove filename in dirID
+  function removeFile(name: string) {
+    const parent = files.get(dirID);
+    if (!parent || parent.type !== 'directory') throw new Error("Invalid parent");
+
+    const fileID = getIDInDirectory(name);
+    if (!fileID) throw new Error("File not in directory");
+
+    const newFiles = new Map(files);
+    newFiles.delete(fileID);
+    newFiles.set(dirID, {
+      ...parent,
+      children: parent.children.filter(id => id !== fileID)
+    })
+    setFiles(newFiles);
+  }
+
+
   function getPath(nodeID: string): string {
     const file = files.get(nodeID);
     if (!file || !file.parentID) return file?.name || "";
@@ -546,11 +567,32 @@ choice: `
       .filter((node): node is FileSystemNode => node !== undefined);
   }
 
+  // Does file exist in dirID
+  function fileExists(name: string): FileSystemNode | undefined {
+    const fileID = getIDInDirectory(name);
+    if (!fileID) {
+      return undefined;
+    }
+    return files.get(fileID);
+  }
+
   function getIDInDirectory(name: string) {
+    if (name == "/") {
+      return "root";
+    }
+    else if (name == "~") {
+      return "home";
+    }
+
     const dirNode = files.get(dirID);
     if (!dirNode || dirNode.type !== 'directory') {
       return undefined;
     }
+
+    if (name == "..") {
+      return dirNode.parentID;
+    }
+
     const childID = dirNode.children.find(id => {
       const childNode = files.get(id);
       return childNode?.name === name;
