@@ -18,7 +18,7 @@ Build and run the hono app
 npx drizzle-kit migrate
 
 npm run build
-npm start
+npm run start
 ```
 
 ## Development
