@@ -1,8 +1,8 @@
 import type { AppType, MinecraftApp } from 'ethansun-website-backend';
 import { hc } from 'hono/client';
 
-// export const BACKEND_URL = "https://famous-wealthy-seal.ngrok-free.app";
-export const BACKEND_URL = "http://localhost:3000";
+export const BACKEND_URL = "https://ethansun-website.onrender.com";
+// export const BACKEND_URL = "http://localhost:3000";
 export const minecraftClient = hc<MinecraftApp>(BACKEND_URL,
   {
     init: {
