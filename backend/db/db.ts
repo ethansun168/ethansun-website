@@ -10,8 +10,10 @@ type User = InferSelectModel<typeof users>
 dotenv.config()
 console.log("DATABASE_URL:", process.env.DATABASE_URL)
 
-const client = postgres(process.env.DATABASE_URL!)
-console.log("Client:", client)
+const client = postgres(process.env.DATABASE_URL!, {
+  ssl: "require"
+})
+// console.log("Client:", client)
 
 const db = drizzle(client, { schema })
 
