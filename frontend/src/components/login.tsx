@@ -17,25 +17,27 @@ export function Login() {
 
   const { mutateAsync: loginRequest } = useMutation({
     mutationFn: async ({ username, password }: { username: string, password: string }) => {
+      let response;
       try {
-        const response = await client.api.v1.login.$post({
+        response = await client.api.v1.login.$post({
           json: {
             username: username,
             password: password,
           },
         })
-        if (!response.ok) {
-          const body = await response.json();
-          if ('message' in body) {
-            throw new Error(body.message);
-          }
-          throw new Error("Unknown error");
-        }
-        return await response.json();
       }
+
       catch {
         throw new Error("Cannot connect to server");
       }
+      if (!response.ok) {
+        const body = await response.json();
+        if ('message' in body) {
+          throw new Error(body.message);
+        }
+        throw new Error("Unknown error");
+      }
+      return await response.json();
     },
     onSuccess: (data) => {
       setError('');

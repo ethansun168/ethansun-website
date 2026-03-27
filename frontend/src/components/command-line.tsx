@@ -256,13 +256,15 @@ choice: `
                   break;
                 }
                 case "loss": {
-                  yield { type: 'error', text: `LOSS: Computer chose ${computerChoice}. You lost one coin.` };
-                  setCoins((prev) => (prev - 1));
+                  const newBalance = Math.max(0, coins - 1);
+                  setCoins(newBalance);
+                  yield { type: 'error', text: `LOSS: Computer chose ${computerChoice}. You lost one coin. Your new balance is ${newBalance}.` };
                   break;
                 }
                 case "win": {
-                  yield { type: 'system', text: `WIN: Computer chose ${computerChoice}. Congratulations! You earned one coin.` };
-                  setCoins((prev) => (prev + 1));
+                  const newBalance = coins + 1;
+                  setCoins(newBalance);
+                  yield { type: 'system', text: `WIN: Computer chose ${computerChoice}. Congratulations! You earned one coin. Your new balance is ${newBalance}!` };
                   break;
                 }
               }
@@ -781,7 +783,7 @@ choice: `
           <span>[Process completed - Close tab to exit]</span>
         </div>
       ) : (
-        <div className="max-w-3xl mx-auto">
+        <div className="max-w-4xl mx-auto">
           <div className="space-y-1 mb-4">
             {history.map((line, i) => (
               <div key={i} className="flex flex-wrap">
