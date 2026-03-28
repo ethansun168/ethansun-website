@@ -1,6 +1,6 @@
 import si from 'systeminformation';
 import os from 'os';
-import { execSync } from 'child_process';
+// import { execSync } from 'child_process';
 
 function secondsToHuman(seconds: number) {
   const days = Math.floor(seconds / 86400);
@@ -23,10 +23,10 @@ export async function getSystemStatus() {
   const osInfo = await si.osInfo();
 
   let sshStatus = 'Offline';
-  try {
-    execSync('systemctl is-active --quiet ssh');
-    sshStatus = 'Online';
-  } catch {}
+  // try {
+  //   execSync('systemctl is-active --quiet ssh');
+  //   sshStatus = 'Online';
+  // } catch {}
 
   return {
     uptime: secondsToHuman(os.uptime()),

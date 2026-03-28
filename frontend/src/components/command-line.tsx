@@ -1,3 +1,6 @@
+import { client } from '@/constants';
+import { useLogin, useUsername } from '@/hooks/query';
+import { useQueryClient } from '@tanstack/react-query';
 import React, { useEffect, useRef, useState } from 'react';
 
 type LogEntry = {
@@ -125,6 +128,7 @@ echo "Type 'help' to see available commands."`,
 ]);
 
 export function CommandLine() {
+  const queryClient = useQueryClient();
   const COMMANDS: Record<string, CommandConfig> = {
     help: {
       fn: () => ({
@@ -171,7 +175,7 @@ export function CommandLine() {
     whoami: {
       fn: () => ({
         type: 'system',
-        text: username
+        text: username ?? "user"
       }),
       description: 'Print effective user name',
       type: 'shell'
@@ -181,16 +185,29 @@ export function CommandLine() {
         const username = yield { type: 'prompt', text: 'Enter username: ' };
         const password = yield { type: 'prompt', text: 'Enter password: ' };
         yield { type: 'system', text: "Verifying..." };
-        await new Promise(r => setTimeout(r, 1000));
-        if (username == 'admin' && password === "admin") {
-          yield { type: "system", text: "Logged in!" };
-          setUsername('admin');
-        }
-        else {
-          yield { type: "error", text: "Invalid credentials." };
+        try {
+          const data = await login({ username, password })
+          yield { type: 'system', text: `Welcome, ${data.username}!` }
+        } catch (error) {
+          yield { type: 'error', text: String(error) }
         }
       },
       description: "Log into the system",
+      type: 'shell'
+    },
+    logout: {
+      fn: async function* () {
+        yield { type: 'system', text: "Logging out..." };
+        try {
+          await client.api.v1.logout.$get();
+          queryClient.setQueryData(['user'], null);
+          yield { type: 'system', text: "Successfully logged out!" };
+        }
+        catch {
+          yield { type: 'error', text: "Logout failed." };
+        }
+      },
+      description: "Log out of the system",
       type: 'shell'
     },
     game: {
@@ -498,6 +515,8 @@ choice: `
     }).join('\n');
   }
 
+  const { mutateAsync: login } = useLogin()
+
   const [input, setInput] = useState<string>('');
   const inputRef = useRef<HTMLInputElement>(null);
   const [history, setHistory] = useState<LogEntry[]>([
@@ -634,8 +653,11 @@ choice: `
     return childID;
   }
 
-  const [username, setUsername] = useState("user")
-  const userPrefix = username + "@dev:" + getPath(dirID) + "$";
+  // const [username, setUsername] = useState("user")
+  const { data: username, isLoading } = useUsername();
+  const userPrefix = isLoading || !username
+    ? "user@dev:" + getPath(dirID) + "$"
+    : username + "@dev:" + getPath(dirID) + "$";
 
   function forceFocus() {
     if (inputRef.current) inputRef.current.focus();

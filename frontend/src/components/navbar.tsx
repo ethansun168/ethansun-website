@@ -95,12 +95,12 @@ export default function Navbar() {
                 >
                   Dashboard
                 </DropdownMenuItem>
-                <DropdownMenuItem
-                  className="cursor-pointer"
-                  onClick={() => navigate('/minecraft')}
-                >
-                  Minecraft
-                </DropdownMenuItem>
+                {/* <DropdownMenuItem */}
+                {/*   className="cursor-pointer" */}
+                {/*   onClick={() => navigate('/minecraft')} */}
+                {/* > */}
+                {/*   Minecraft */}
+                {/* </DropdownMenuItem> */}
                 <DropdownMenuItem
                   className="cursor-pointer"
                   onClick={logout}

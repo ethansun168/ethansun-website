@@ -64,7 +64,8 @@ const app = new Hono()
         path: '/'
       });
 
-      return c.json(user);
+      const { password: pw, ...safeUser } = user;
+      return c.json(safeUser);
     })
   .get('/api/v1/me', requireAuth, async (c) => {
     const username = c.get('username');

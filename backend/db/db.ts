@@ -13,7 +13,6 @@ console.log("DATABASE_URL:", process.env.DATABASE_URL)
 const client = postgres(process.env.DATABASE_URL!, {
   ssl: "require"
 })
-// console.log("Client:", client)
 
 const db = drizzle(client, { schema })
 

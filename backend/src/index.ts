@@ -4,33 +4,41 @@ import { cors } from 'hono/cors';
 import auth, { requireAuth } from './auth.js';
 import minecraft, { injectWebSocket } from './minecraft.js';
 import { getSystemStatus } from './system-status.js';
+import { logger } from 'hono/logger';
 
 const app = new Hono().use("*", cors({
-  origin: [ 'http://localhost:5173', 'http://localhost:4173', 'https://ethansun.org'],
+  origin: ['http://localhost:5173', 'http://localhost:4173', 'https://ethansun.org'],
   allowMethods: ['GET', 'POST', 'OPTIONS'],
   allowHeaders: ['Content-Type', 'ngrok-skip-browser-warning'],
   credentials: true,
 }))
 
+app.use(logger())
 const route = app.get('/', (c) => {
-  return c.text('Hello Hono!')
+  const routes = app.routes
+    .filter((r) => r.method !== "ALL")
+    .map((r) => ({ method: r.method, path: r.path }))
+    .filter((r, i, arr) =>
+      arr.findIndex(x => x.method === r.method && x.path === r.path) === i
+    )
+  return c.json(routes)
 })
-.get('/api/v1', (c) => {
-  return c.json({"hello": "world"})
-})
-.get('/api/v1/dashboard', requireAuth, async(c) => {
-  const status = await getSystemStatus();
-  return c.json(status);
-})
-.route('/', auth)
-.route('/', minecraft);
+  .get('/api/v1', (c) => {
+    return c.json({ "hello": "world" })
+  })
+  .get('/api/v1/dashboard', requireAuth, async (c) => {
+    const status = await getSystemStatus();
+    return c.json(status);
+  })
+  .route('/', auth)
+  .route('/', minecraft);
 
 const server = serve({
   fetch: app.fetch,
   port: 3000
 }, (info) => {
-    console.log(`Server is running on http://localhost:${info.port}`)
-  })
+  console.log(`Server is running on http://localhost:${info.port}`)
+})
 
 injectWebSocket(server);
 

@@ -6,7 +6,7 @@ import { Game } from './components/game/game';
 import { Shop } from './components/game/shop';
 import { Home } from './components/home';
 import { Login } from './components/login';
-import { Minecraft } from './components/minecraft';
+// import { Minecraft } from './components/minecraft';
 import Navbar from './components/navbar';
 import { NotFound } from './components/not-found';
 import { ThemeProvider } from './components/theme-provider';
@@ -49,7 +49,7 @@ function App() {
         <Route path="/contact" element={<Contact />} />
         <Route path="/login" element={<Login />} />
         <Route path="/dashboard" element={<Dashboard />} />
-        <Route path="/minecraft" element={<Minecraft />} />
+        {/* <Route path="/minecraft" element={<Minecraft />} /> */}
         <Route path="/game" element={<Game points={points} setPoints={setPoints} items={items} setItems={setItems} />} />
         <Route path="/shop" element={<Shop points={points} setPoints={setPoints} items={items} setItems={setItems} />} />
         <Route path="/command" element={<CommandLine />} />
