@@ -1,13 +1,13 @@
 import { Hono } from "hono";
-import { requireAuth } from "./auth.js";
 import { createMessage, deleteMessage, editMessage, getMessages } from "../db/db.js";
 import { zValidator } from "@hono/zod-validator";
 import z from "zod";
+import { requireAuth } from "./middleware.js";
+import { Bindings, Variables } from "./types.js";
 
-const app = new Hono()
+const app = new Hono<{ Bindings: Bindings; Variables: Variables }>()
   .get('/api/v1/messages', requireAuth, async (c) => {
-    const username = c.get("username")
-    const messages = await getMessages(username);
+    const messages = await getMessages(c.get('db'));
     return c.json(messages)
   })
   .post('/api/v1/messages',
@@ -22,7 +22,7 @@ const app = new Hono()
       // Create message
       const username = c.get("username")
       const { message } = c.req.valid('json');
-      await createMessage(username, message)
+      await createMessage(c.get('db'), username, message)
       return c.json({ "message": "Message created" })
     })
   .patch('/api/v1/messages/:id',
@@ -38,7 +38,7 @@ const app = new Hono()
       const username = c.get("username")
       const id = c.req.param('id')
       const { message } = c.req.valid('json');
-      if (await editMessage(id, message, username)) {
+      if (await editMessage(c.get('db'), id, message, username)) {
         return c.body(null, 204)
       }
       return c.json({ "message": "Message update failed" }, 404)
@@ -49,7 +49,7 @@ const app = new Hono()
       // Delete message
       const username = c.get("username")
       const id = c.req.param('id')
-      if (await deleteMessage(id, username)) {
+      if (await deleteMessage(c.get('db'), id, username)) {
         return c.body(null, 204)
       }
       return c.json({ "message": "Message deletion failed" }, 404)

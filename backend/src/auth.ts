@@ -1,17 +1,12 @@
 import { zValidator } from "@hono/zod-validator";
 import bcrypt from "bcryptjs";
-import dotenv from 'dotenv';
 import { Hono } from "hono";
-import { deleteCookie, getSignedCookie, setSignedCookie } from "hono/cookie";
-import { createMiddleware } from "hono/factory";
+import { deleteCookie, setSignedCookie } from "hono/cookie";
 import z from "zod";
 import { getUser } from "../db/db.js";
+import { AUTH_COOKIE_NAME, requireAuth } from "./middleware.js";
+import { Bindings, Variables } from "./types.js";
 
-dotenv.config();
-const COOKIE_SECRET = process.env.COOKIE_SECRET;
-if (!COOKIE_SECRET) throw new Error("Cookie secret invalid");
-
-const AUTH_COOKIE_NAME = 'authCookie';
 const SALT_ROUNDS = 5;
 export async function hashPassword(plainPassword: string) {
   const salt = await bcrypt.genSalt(SALT_ROUNDS);
@@ -24,20 +19,8 @@ export async function verifyPassword(plainPassword: string, hashedPassword: stri
   return match;
 }
 
-export const requireAuth = createMiddleware<{
-  Variables: {
-    username: string
-  }
-}>(async (c, next) => {
-  const username = await getSignedCookie(c, COOKIE_SECRET, AUTH_COOKIE_NAME);
-  if (!username) {
-    return c.json({ message: "Unauthorized" }, 401);
-  }
-  c.set('username', username);
-  await next();
-})
 
-const app = new Hono()
+const app = new Hono<{ Bindings: Bindings; Variables: Variables }>()
   .post(
     '/api/v1/login',
     zValidator(
@@ -48,12 +31,13 @@ const app = new Hono()
       })
     ), async (c) => {
       const { username, password } = c.req.valid('json');
-      const user = await getUser(username);
+
+      const user = await getUser(c.get('db'), username);
       if (!user || !await verifyPassword(password, user.password)) {
         return c.json({ "message": "Invalid credentials" }, 401);
       }
 
-      await setSignedCookie(c, AUTH_COOKIE_NAME, username, COOKIE_SECRET, {
+      await setSignedCookie(c, AUTH_COOKIE_NAME, username, c.env.COOKIE_SECRET, {
         httpOnly: true,
         secure: true,
         sameSite: 'none',
@@ -66,7 +50,7 @@ const app = new Hono()
     })
   .get('/api/v1/me', requireAuth, async (c) => {
     const username = c.get('username');
-    const user = await getUser(username);
+    const user = await getUser(c.get('db'), username);
     if (!user) {
       return c.json({ "message": "User not found" }, 404)
     }

@@ -1,7 +1,7 @@
 import { useEffect, useState } from 'react';
 import { Route, Routes } from 'react-router-dom';
 import { About } from './components/about';
-import { Dashboard } from './components/dashboard';
+// import { Dashboard } from './components/dashboard';
 import { Game } from './components/game/game';
 import { Shop } from './components/game/shop';
 import { Home } from './components/home';
@@ -49,8 +49,7 @@ function App() {
         <Route path="/about" element={<About />} />
         <Route path="/contact" element={<Contact />} />
         <Route path="/login" element={<Login />} />
-        <Route path="/dashboard" element={<Dashboard />} />
-        {/* <Route path="/minecraft" element={<Minecraft />} /> */}
+        {/* <Route path="/dashboard" element={<Dashboard />} /> */}
         <Route path="/game" element={<Game points={points} setPoints={setPoints} items={items} setItems={setItems} />} />
         <Route path="/shop" element={<Shop points={points} setPoints={setPoints} items={items} setItems={setItems} />} />
         <Route path="/command" element={<CommandLine />} />

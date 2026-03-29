@@ -1,14 +1,16 @@
-import { pgTable, varchar, timestamp, uuid, text } from "drizzle-orm/pg-core";
+import { sql } from "drizzle-orm";
+import { integer, sqliteTable, text } from "drizzle-orm/sqlite-core";
 
-export const users = pgTable("users", {
-  username: varchar("username", { length: 20 }).notNull().primaryKey(),
-  password: varchar("password", { length: 256 }).notNull(),
-  created: timestamp("created").defaultNow(),
+export const users = sqliteTable("users", {
+  username: text("username", { length: 20 }).notNull().primaryKey(),
+  password: text("password", { length: 256 }).notNull(),
+  createdAt: integer("created", { mode: "timestamp" }).notNull().default(sql`(unixepoch())`),
+  role: text("role", { enum: ["admin", "user"] }).notNull().default("user")
 })
 
-export const messages = pgTable("messages", {
-  id: uuid("id").primaryKey().defaultRandom(),
-  username: varchar("username").notNull().references(() => users.username, { onDelete: "cascade" }),
+export const messages = sqliteTable("messages", {
+  id: text("id").primaryKey().$defaultFn(() => crypto.randomUUID()),
+  username: text("username").notNull().references(() => users.username, { onDelete: "cascade" }),
   content: text("content").notNull(),
-  createdAt: timestamp("created_at").notNull().defaultNow()
+  createdAt: integer("created", { mode: "timestamp" }).notNull().default(sql`(unixepoch())`),
 })

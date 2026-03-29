@@ -2,21 +2,18 @@
   "name": "ethansun-website-backend",
   "type": "module",
   "scripts": {
-    "dev": "tsx watch src/index.ts",
+    "dev": "wrangler dev --remote",
     "build": "rm -rf dist && tsc",
-    "start": "node dist/src/index.js"
+    "deploy": "wrangler deploy --minify",
+    "cf-typegen": "wrangler types --env-interface CloudflareBindings"
   },
   "types": "dist/src/index.d.ts",
   "dependencies": {
-    "@hono/node-server": "^1.18.2",
-    "@hono/node-ws": "^1.2.0",
     "@hono/zod-validator": "^0.7.2",
     "@ngrok/ngrok": "^1.5.2",
     "bcryptjs": "^3.0.2",
-    "dotenv": "^17.2.1",
     "drizzle-orm": "^0.45.1",
     "hono": "^4.9.2",
-    "postgres": "^3.4.8",
     "systeminformation": "^5.27.7",
     "zod": "^4.0.17"
   },
@@ -26,6 +23,7 @@
     "@types/systeminformation": "^3.23.1",
     "drizzle-kit": "^0.31.10",
     "tsx": "^4.7.1",
-    "typescript": "^5.8.3"
+    "typescript": "^5.8.3",
+    "wrangler": "^4.4.0"
   }
 }

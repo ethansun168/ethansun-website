@@ -24,8 +24,7 @@ const navLinks = [
 
 const dropdownLinks = [
   { name: 'Messages', to: '/messages' },
-  { name: 'Dashboard', to: '/dashboard' },
-  // { name: 'Minecraft', to: '/minecraft' },
+  // { name: 'Dashboard', to: '/dashboard' },
 ]
 
 export default function Navbar() {
