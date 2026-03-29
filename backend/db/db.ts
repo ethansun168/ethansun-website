@@ -26,7 +26,7 @@ export async function getUser(username: string): Promise<User | null> {
 
 // TODO: make it paginated
 export async function getMessages(username: string): Promise<Message[]> {
-  return await db.select().from(messages).where(eq(messages.username, username)).orderBy(desc(messages.createdAt))
+  return await db.select().from(messages).orderBy(desc(messages.createdAt))
 }
 
 export async function createMessage(username: string, content: string) {

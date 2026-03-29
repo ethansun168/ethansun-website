@@ -175,22 +175,28 @@ export function Messages() {
                         <p className="text-gray-400 dark:text-gray-500 text-xs mr-2">
                           {new Date(msg.createdAt).toLocaleTimeString([], { hour: "2-digit", minute: "2-digit" })}
                         </p>
-                        <Button
-                          variant="ghost"
-                          size="icon"
-                          className="h-7 w-7 text-gray-400 hover:text-gray-700 dark:hover:text-white cursor-pointer"
-                          onClick={() => openEdit(msg)}
-                        >
-                          <Pencil className="h-3.5 w-3.5" />
-                        </Button>
-                        <Button
-                          variant="ghost"
-                          size="icon"
-                          className="h-7 w-7 text-gray-400 hover:text-red-500 cursor-pointer"
-                          onClick={() => deleteMessage({ id: msg.id })}
-                        >
-                          <Trash2 className="h-3.5 w-3.5" />
-                        </Button>
+                        {
+                          msg.username === username ? (
+                            <>
+                              <Button
+                                variant="ghost"
+                                size="icon"
+                                className="h-7 w-7 text-gray-400 hover:text-gray-700 dark:hover:text-white cursor-pointer"
+                                onClick={() => openEdit(msg)}
+                              >
+                                <Pencil className="h-3.5 w-3.5" />
+                              </Button>
+                              <Button
+                                variant="ghost"
+                                size="icon"
+                                className="h-7 w-7 text-gray-400 hover:text-red-500 cursor-pointer"
+                                onClick={() => deleteMessage({ id: msg.id })}
+                              >
+                                <Trash2 className="h-3.5 w-3.5" />
+                              </Button>
+                            </>
+                          ) : null
+                        }
                       </div>
                     </div>
                     <p className="text-gray-900 dark:text-white text-sm">{msg.content}</p>
