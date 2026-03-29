@@ -11,7 +11,7 @@ export function Login() {
   const [password, setPassword] = useState("");
   const [error, setError] = useState("");
   const { data, isLoading } = useUsername();
-  const { mutateAsync: loginRequest } = useLogin(
+  const { mutateAsync: loginRequest, isPending: loginPending } = useLogin(
     () => {
       setError('');
       navigate('/dashboard', { replace: true });
@@ -23,8 +23,6 @@ export function Login() {
 
   async function login(e: React.FormEvent<HTMLFormElement>) {
     e.preventDefault();
-    setUsername("");
-    setPassword("");
     await loginRequest({ username, password });
   };
 
@@ -81,7 +79,13 @@ export function Login() {
             )}
 
             <Button type="submit" className="w-full">
-              Login
+              {
+                loginPending ? (
+                  <div className="h-4 w-4 rounded-full border-2 border-gray-200 dark:border-gray-700 border-t-gray-900 dark:border-t-white animate-spin" />
+                ) : <>
+                  Login
+                </>
+              }
             </Button>
           </form>
 

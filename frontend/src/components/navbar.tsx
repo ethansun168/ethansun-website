@@ -23,6 +23,12 @@ const navLinks = [
   { name: 'Contact', to: '/contact' },
 ];
 
+const dropdownLinks = [
+  { name: 'Dashboard', to: '/dashboard' },
+  { name: 'Messages', to: '/messages' },
+  // { name: 'Minecraft', to: '/minecraft' },
+]
+
 export default function Navbar() {
   const [hidden, setHidden] = useState(false);
 
@@ -59,9 +65,7 @@ export default function Navbar() {
     >
       <div className="w-full flex justify-between p-4">
         <div className="flex space-x-4">
-
           <span className="font-bold text-lg">mirt smegle b</span>
-
           <div className="hidden md:flex space-x-4">
             {
               navLinks.map(link => (
@@ -89,18 +93,17 @@ export default function Navbar() {
                 </Avatar>
               </DropdownMenuTrigger>
               <DropdownMenuContent align="end">
-                <DropdownMenuItem
-                  className="cursor-pointer"
-                  onClick={() => navigate('/dashboard')}
-                >
-                  Dashboard
-                </DropdownMenuItem>
-                {/* <DropdownMenuItem */}
-                {/*   className="cursor-pointer" */}
-                {/*   onClick={() => navigate('/minecraft')} */}
-                {/* > */}
-                {/*   Minecraft */}
-                {/* </DropdownMenuItem> */}
+                {
+                  dropdownLinks.map(link => (
+                    <DropdownMenuItem
+                      key={link.to}
+                      className="cursor-pointer"
+                      onClick={() => navigate(link.to)}
+                    >
+                      {link.name}
+                    </DropdownMenuItem>
+                  ))
+                }
                 <DropdownMenuItem
                   className="cursor-pointer"
                   onClick={logout}

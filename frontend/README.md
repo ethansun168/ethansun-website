@@ -1,16 +1,24 @@
 # Ethan Website
-The website is located at https://ethansun.org
 
-## Quickstart
+The website is located at <https://ethansun.org>
+
+## Install
+
 ```
 # Build backend
 cd backend && npm ci && npm run build
 # Install frontend dependencies
 npm install
+```
+
+## Development
+
+```
 npm run dev
 ```
 
 ## Tech Stack
+
 - Vite
 - TypeScript
 - React
@@ -18,6 +26,7 @@ npm run dev
 - React Query
 
 # References
+
 - [Github Pages](https://docs.github.com/en/pages/configuring-a-custom-domain-for-your-github-pages-site/about-custom-domains-and-github-pages)
 - [Vite Setup](https://vite.dev/guide/static-deploy)
 - [Github Pages SPA setup](https://github.com/rafgraph/spa-github-pages/)

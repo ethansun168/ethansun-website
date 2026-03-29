@@ -12,6 +12,7 @@ import { NotFound } from './components/not-found';
 import { ThemeProvider } from './components/theme-provider';
 import { Contact } from './components/contact';
 import { CommandLine } from './components/command-line';
+import { Messages } from './components/messages';
 
 export type UserItem = {
   id: number,
@@ -53,6 +54,7 @@ function App() {
         <Route path="/game" element={<Game points={points} setPoints={setPoints} items={items} setItems={setItems} />} />
         <Route path="/shop" element={<Shop points={points} setPoints={setPoints} items={items} setItems={setItems} />} />
         <Route path="/command" element={<CommandLine />} />
+        <Route path="/messages" element={<Messages />} />
         <Route path="*" element={<NotFound />} />
       </Routes>
     </ThemeProvider>

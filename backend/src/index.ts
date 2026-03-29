@@ -5,16 +5,17 @@ import auth, { requireAuth } from './auth.js';
 import minecraft, { injectWebSocket } from './minecraft.js';
 import { getSystemStatus } from './system-status.js';
 import { logger } from 'hono/logger';
+import messages from './messages.js'
 
 const app = new Hono().use("*", cors({
   origin: ['http://localhost:5173', 'http://localhost:4173', 'https://ethansun.org'],
-  allowMethods: ['GET', 'POST', 'OPTIONS'],
+  allowMethods: ['GET', 'POST', 'PATCH', 'DELETE', 'OPTIONS'],
   allowHeaders: ['Content-Type', 'ngrok-skip-browser-warning'],
   credentials: true,
 }))
 
 app.use(logger())
-const route = app.get('/', (c) => {
+const route = app.get('/api/v1', (c) => {
   const routes = app.routes
     .filter((r) => r.method !== "ALL")
     .map((r) => ({ method: r.method, path: r.path }))
@@ -23,15 +24,13 @@ const route = app.get('/', (c) => {
     )
   return c.json(routes)
 })
-  .get('/api/v1', (c) => {
-    return c.json({ "hello": "world" })
-  })
   .get('/api/v1/dashboard', requireAuth, async (c) => {
     const status = await getSystemStatus();
     return c.json(status);
   })
   .route('/', auth)
-  .route('/', minecraft);
+  .route('/', minecraft)
+  .route('/', messages)
 
 const server = serve({
   fetch: app.fetch,
