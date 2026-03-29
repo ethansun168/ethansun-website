@@ -10,8 +10,8 @@ import { MinecraftFiles } from './minecraft-files';
 import { MinecraftSettings } from "./minecraft-settings";
 
 export function Minecraft() {
-  const { username, isLoading } = useRequireAuth();
-  if (!username || isLoading) return null;
+  const { user, isLoading } = useRequireAuth();
+  if (!user || isLoading) return null;
 
   return (
     <div className="w-full max-w-7xl mt-8 px-4 mx-auto">

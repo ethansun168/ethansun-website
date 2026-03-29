@@ -3,7 +3,7 @@ import { useMutation, useQuery } from "@tanstack/react-query";
 import type { InferResponseType } from "hono/client";
 import { useQueryClient } from "@tanstack/react-query";
 
-export function useUsername() {
+export function useUser() {
   return useQuery({
     queryKey: ['user'],
     queryFn: async () => {
@@ -12,7 +12,9 @@ export function useUsername() {
         throw new Error("Not authenticated");
       }
       const body = await response.json();
-      return body.username;
+      console.log(body)
+      return body
+      // return await response.json();
     },
     retry: false,
     refetchOnWindowFocus: false,
@@ -54,7 +56,7 @@ export function useLogin(
       if (onSuccess) {
         onSuccess(data)
       }
-      queryClient.setQueryData(['user'], data.username);
+      queryClient.setQueryData(['user'], data);
     },
     onError: onError
   })

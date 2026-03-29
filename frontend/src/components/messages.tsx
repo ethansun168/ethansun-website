@@ -14,7 +14,7 @@ import { useMutation, useQuery, useQueryClient } from "@tanstack/react-query";
 import { useRequireAuth } from "@/hooks/auth";
 
 export function Messages() {
-  const { username, isLoading } = useRequireAuth();
+  const { user, isLoading } = useRequireAuth();
   const [modalOpen, setModalOpen] = useState(false);
   const [modalText, setModalText] = useState("");
 
@@ -136,7 +136,7 @@ export function Messages() {
     setModalOpen(false);
   };
 
-  if (!username || isLoading) return "Logging in...";
+  if (!user || isLoading) return "Logging in...";
 
   return (
     <div className="min-h-[calc(100vh-4rem)] flex flex-col bg-white dark:bg-gray-950">
@@ -176,7 +176,7 @@ export function Messages() {
                           {new Date(msg.createdAt).toLocaleTimeString([], { hour: "2-digit", minute: "2-digit" })}
                         </p>
                         {
-                          msg.username === username ? (
+                          msg.username === user.username ? (
                             <>
                               <Button
                                 variant="ghost"

@@ -6,10 +6,9 @@ import {
   DropdownMenuItem,
   DropdownMenuTrigger,
 } from "@/components/ui/dropdown-menu";
-import { Spinner } from '@/components/ui/shadcn-io/spinner';
 import { Sheet, SheetClose, SheetContent, SheetDescription, SheetHeader, SheetTitle, SheetTrigger } from '@/components/ui/sheet';
 import { client } from "@/constants";
-import { useUsername } from "@/hooks/query";
+import { useUser } from "@/hooks/query";
 import { useQueryClient } from "@tanstack/react-query";
 import { useEffect, useState } from "react";
 import { Link, useNavigate } from "react-router-dom";
@@ -24,8 +23,8 @@ const navLinks = [
 ];
 
 const dropdownLinks = [
-  { name: 'Dashboard', to: '/dashboard' },
   { name: 'Messages', to: '/messages' },
+  { name: 'Dashboard', to: '/dashboard' },
   // { name: 'Minecraft', to: '/minecraft' },
 ]
 
@@ -46,7 +45,7 @@ export default function Navbar() {
 
   const queryClient = useQueryClient();
   const navigate = useNavigate();
-  const { data: username, isLoading } = useUsername();
+  const { data: user } = useUser();
   async function logout() {
     try {
       await client.api.v1.logout.$get();
@@ -83,42 +82,41 @@ export default function Navbar() {
 
         <div className="flex space-x-4">
           <ModeToggle />
-          {isLoading ? (
-            <Spinner />
-          ) : username ? (
-            <DropdownMenu>
-              <DropdownMenuTrigger className="cursor-pointer">
-                <Avatar>
-                  <AvatarFallback>{username.charAt(0).toUpperCase()}</AvatarFallback>
-                </Avatar>
-              </DropdownMenuTrigger>
-              <DropdownMenuContent align="end">
-                {
-                  dropdownLinks.map(link => (
-                    <DropdownMenuItem
-                      key={link.to}
-                      className="cursor-pointer"
-                      onClick={() => navigate(link.to)}
-                    >
-                      {link.name}
-                    </DropdownMenuItem>
-                  ))
-                }
-                <DropdownMenuItem
-                  className="cursor-pointer"
-                  onClick={logout}
-                >
-                  Logout
-                </DropdownMenuItem>
-              </DropdownMenuContent>
-            </DropdownMenu>
-          ) : (
-            <Link to="/login">
-              <Button className="cursor-pointer" variant="default">
-                Login
-              </Button>
-            </Link>
-          )}
+          {
+            user ? (
+              <DropdownMenu>
+                <DropdownMenuTrigger className="cursor-pointer">
+                  <Avatar>
+                    <AvatarFallback>{user.username.charAt(0).toUpperCase()}</AvatarFallback>
+                  </Avatar>
+                </DropdownMenuTrigger>
+                <DropdownMenuContent align="end">
+                  {
+                    dropdownLinks.map(link => (
+                      <DropdownMenuItem
+                        key={link.to}
+                        className="cursor-pointer"
+                        onClick={() => navigate(link.to)}
+                      >
+                        {link.name}
+                      </DropdownMenuItem>
+                    ))
+                  }
+                  <DropdownMenuItem
+                    className="cursor-pointer"
+                    onClick={logout}
+                  >
+                    Logout
+                  </DropdownMenuItem>
+                </DropdownMenuContent>
+              </DropdownMenu>
+            ) : (
+              <Link to="/login">
+                <Button className="cursor-pointer" variant="default">
+                  Login
+                </Button>
+              </Link>
+            )}
 
           <Sheet>
             <SheetTrigger className="md:hidden">

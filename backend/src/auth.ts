@@ -49,11 +49,8 @@ const app = new Hono()
     ), async (c) => {
       const { username, password } = c.req.valid('json');
       const user = await getUser(username);
-      if (!user) {
-        return c.json({ "message": "Failed to get user" }, 404);
-      }
-      if (!await verifyPassword(password, user.password)) {
-        return c.json({ "message": "Wrong password" }, 401)
+      if (!user || !await verifyPassword(password, user.password)) {
+        return c.json({ "message": "Invalid credentials" }, 401);
       }
 
       await setSignedCookie(c, AUTH_COOKIE_NAME, username, COOKIE_SECRET, {
@@ -69,7 +66,13 @@ const app = new Hono()
     })
   .get('/api/v1/me', requireAuth, async (c) => {
     const username = c.get('username');
-    return c.json({ "username": username });
+    const user = await getUser(username);
+    if (!user) {
+      return c.json({ "message": "User not found" }, 404)
+    }
+    // Exclude password
+    const { password: pw, ...safeUser } = user;
+    return c.json(safeUser);
   })
   .get('/api/v1/logout', requireAuth, async (c) => {
     deleteCookie(c, AUTH_COOKIE_NAME, {

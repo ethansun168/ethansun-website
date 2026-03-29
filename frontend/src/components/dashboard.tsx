@@ -6,7 +6,7 @@ import { useQuery } from '@tanstack/react-query';
 import { Progress } from "./ui/progress";
 
 export function Dashboard() {
-  const { username, isLoading } = useRequireAuth();
+  const { user, isLoading } = useRequireAuth();
   const { data: systemData } = useQuery({
     queryKey: ['system-status'],
     queryFn: async () => {
@@ -16,7 +16,7 @@ export function Dashboard() {
     },
     refetchInterval: 1000
   })
-  if (!username || isLoading) return "Logging in...";
+  if (!user || isLoading) return "Logging in...";
 
   if (!systemData) return "Fetching system data..."
 

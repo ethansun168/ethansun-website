@@ -1,5 +1,5 @@
 import { client } from '@/constants';
-import { useLogin, useUsername } from '@/hooks/query';
+import { useLogin, useUser } from '@/hooks/query';
 import { useQueryClient } from '@tanstack/react-query';
 import React, { useEffect, useRef, useState } from 'react';
 
@@ -175,7 +175,7 @@ export function CommandLine() {
     whoami: {
       fn: () => ({
         type: 'system',
-        text: username ?? "user"
+        text: user?.username ?? "user"
       }),
       description: 'Print effective user name',
       type: 'shell'
@@ -212,7 +212,7 @@ export function CommandLine() {
     },
     game: {
       fn: async function* () {
-        yield { type: 'system', text: `Welcome to the game, ${username}!` };
+        yield { type: 'system', text: `Welcome to the game, ${user?.username ?? "user"}!` };
 
         while (true) {
           const answer = yield {
@@ -653,11 +653,10 @@ choice: `
     return childID;
   }
 
-  // const [username, setUsername] = useState("user")
-  const { data: username, isLoading } = useUsername();
-  const userPrefix = isLoading || !username
+  const { data: user, isLoading } = useUser();
+  const userPrefix = isLoading || !user
     ? "user@dev:" + getPath(dirID) + "$"
-    : username + "@dev:" + getPath(dirID) + "$";
+    : user.username + "@dev:" + getPath(dirID) + "$";
 
   function forceFocus() {
     if (inputRef.current) inputRef.current.focus();

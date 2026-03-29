@@ -1,13 +1,13 @@
 import { minecraftClient } from '@/constants';
 import { useEffect, useState, useRef } from 'react';
-import { useUsername } from './query';
+import { useUser } from './query';
 
 export function useWebSocket() {
   const [connected, setConnected] = useState(false);
   const [messages, setMessages] = useState<string[]>([]);
   const wsRef = useRef<WebSocket | null>(null);
 
-  const { data, isLoading } = useUsername();
+  const { data, isLoading } = useUser();
 
   useEffect(() => {
     if (isLoading || !data) return;

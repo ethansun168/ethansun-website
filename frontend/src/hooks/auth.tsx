@@ -1,16 +1,16 @@
 import { useEffect } from "react"
 import { useNavigate } from "react-router-dom"
-import { useUsername } from "@/hooks/query"
+import { useUser } from "@/hooks/query"
 
 export function useRequireAuth() {
   const navigate = useNavigate()
-  const { data: username, isLoading } = useUsername()
+  const { data: user, isLoading } = useUser()
 
   useEffect(() => {
-    if (!username && !isLoading) {
+    if (!user && !isLoading) {
       navigate("/login")
     }
-  }, [username, isLoading, navigate])
+  }, [user, isLoading, navigate])
 
-  return { username, isLoading }
+  return { user, isLoading }
 }
