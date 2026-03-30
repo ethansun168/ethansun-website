@@ -101,6 +101,16 @@ export default function Navbar() {
                       </DropdownMenuItem>
                     ))
                   }
+                  {
+                    user.role === 'admin' ? (
+                      <DropdownMenuItem
+                        className="cursor-pointer"
+                        onClick={() => navigate("/admin")}
+                      >
+                        Admin
+                      </DropdownMenuItem>
+                    ) : null
+                  }
                   <DropdownMenuItem
                     className="cursor-pointer"
                     onClick={logout}

@@ -139,7 +139,7 @@ export function Messages() {
   if (!user || isLoading) return "Logging in...";
 
   return (
-    <div className="min-h-[calc(100vh-4rem)] flex flex-col bg-white dark:bg-gray-950">
+    <div className="min-h-[calc(100vh-4rem)] flex flex-col bg-slate-50 dark:bg-slate-950">
       {/* Messages */}
       <div className="flex-1 overflow-y-auto px-4 py-6 space-y-3 max-w-4xl mx-auto w-full">
         {

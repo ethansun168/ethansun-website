@@ -3,12 +3,11 @@ import { cors } from 'hono/cors';
 import { logger } from 'hono/logger';
 import auth from './auth.js';
 import messages from './messages.js';
-import { getSystemStatus } from './system-status.js';
-import { requireAuth } from './middleware.js';
+import users from './users.js';
 import { createDb } from '../db/db.js';
-import { Bindings, Variables } from './types.js';
+import { AppEnv } from './types.js';
 
-const app = new Hono<{ Bindings: Bindings; Variables: Variables }>().use("*", cors({
+const app = new Hono<AppEnv>().use("*", cors({
   origin: ['http://localhost:5173', 'http://localhost:4173', 'https://ethansun.org'],
   allowMethods: ['GET', 'POST', 'PATCH', 'DELETE', 'OPTIONS'],
   allowHeaders: ['Content-Type', 'ngrok-skip-browser-warning'],
@@ -31,11 +30,8 @@ const route = app.get('/api/v1', (c) => {
     )
   return c.json(routes)
 })
-  // .get('/api/v1/dashboard', requireAuth, async (c) => {
-  //   const status = await getSystemStatus();
-  //   return c.json(status);
-  // })
   .route('/', auth)
+  .route('/', users)
   .route('/', messages)
 
 export default app;

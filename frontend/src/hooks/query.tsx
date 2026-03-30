@@ -11,10 +11,7 @@ export function useUser() {
       if (!response.ok) {
         throw new Error("Not authenticated");
       }
-      const body = await response.json();
-      console.log(body)
-      return body
-      // return await response.json();
+      return await response.json();
     },
     retry: false,
     refetchOnWindowFocus: false,

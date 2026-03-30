@@ -8,6 +8,8 @@ export const users = sqliteTable("users", {
   role: text("role", { enum: ["admin", "user"] }).notNull().default("user")
 })
 
+export const ROLES = users.role.enumValues
+
 export const messages = sqliteTable("messages", {
   id: text("id").primaryKey().$defaultFn(() => crypto.randomUUID()),
   username: text("username").notNull().references(() => users.username, { onDelete: "cascade" }),

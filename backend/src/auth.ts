@@ -5,7 +5,7 @@ import { deleteCookie, setSignedCookie } from "hono/cookie";
 import z from "zod";
 import { getUser } from "../db/db.js";
 import { AUTH_COOKIE_NAME, requireAuth } from "./middleware.js";
-import { Bindings, Variables } from "./types.js";
+import { AppEnv } from "./types.js";
 
 const SALT_ROUNDS = 5;
 export async function hashPassword(plainPassword: string) {
@@ -20,7 +20,7 @@ export async function verifyPassword(plainPassword: string, hashedPassword: stri
 }
 
 
-const app = new Hono<{ Bindings: Bindings; Variables: Variables }>()
+const app = new Hono<AppEnv>()
   .post(
     '/api/v1/login',
     zValidator(
@@ -31,7 +31,6 @@ const app = new Hono<{ Bindings: Bindings; Variables: Variables }>()
       })
     ), async (c) => {
       const { username, password } = c.req.valid('json');
-
       const user = await getUser(c.get('db'), username);
       if (!user || !await verifyPassword(password, user.password)) {
         return c.json({ "message": "Invalid credentials" }, 401);

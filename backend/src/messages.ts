@@ -3,9 +3,9 @@ import { createMessage, deleteMessage, editMessage, getMessages } from "../db/db
 import { zValidator } from "@hono/zod-validator";
 import z from "zod";
 import { requireAuth } from "./middleware.js";
-import { Bindings, Variables } from "./types.js";
+import { AppEnv } from "./types.js";
 
-const app = new Hono<{ Bindings: Bindings; Variables: Variables }>()
+const app = new Hono<AppEnv>()
   .get('/api/v1/messages', requireAuth, async (c) => {
     const messages = await getMessages(c.get('db'));
     return c.json(messages)

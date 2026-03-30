@@ -1,10 +1,15 @@
 import { createDb } from "../db/db.js";
 
-export type Bindings = {
+type Bindings = {
   DB: D1Database;
   COOKIE_SECRET: string;
 };
 
-export type Variables = {
+type Variables = {
   db: ReturnType<typeof createDb>
+}
+
+export type AppEnv = {
+  Bindings: Bindings;
+  Variables: Variables
 }

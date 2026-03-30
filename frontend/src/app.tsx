@@ -13,6 +13,7 @@ import { ThemeProvider } from './components/theme-provider';
 import { Contact } from './components/contact';
 import { CommandLine } from './components/command-line';
 import { Messages } from './components/messages';
+import { Admin } from './components/admin';
 
 export type UserItem = {
   id: number,
@@ -54,6 +55,7 @@ function App() {
         <Route path="/shop" element={<Shop points={points} setPoints={setPoints} items={items} setItems={setItems} />} />
         <Route path="/command" element={<CommandLine />} />
         <Route path="/messages" element={<Messages />} />
+        <Route path="/admin" element={<Admin />} />
         <Route path="*" element={<NotFound />} />
       </Routes>
     </ThemeProvider>
