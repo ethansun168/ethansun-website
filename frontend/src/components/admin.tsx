@@ -45,8 +45,8 @@ import {
   Search
 } from "lucide-react";
 import { useState } from "react";
-import { Dialog, DialogContent, DialogHeader, DialogTitle } from "./ui/dialog";
 import { Forbidden } from "./forbidden";
+import { Dialog, DialogContent, DialogHeader, DialogTitle } from "./ui/dialog";
 
 function formatDate(date: Date): string {
   return date.toLocaleDateString("en-US", { year: "numeric", month: "short", day: "numeric" });
@@ -79,6 +79,7 @@ export function Admin() {
   })
 
   type Role = typeof ROLES[number]
+  type User = NonNullable<typeof user>
   type SortField = keyof NonNullable<NonNullable<typeof users>[number]>
   type SortDir = "asc" | "desc";
 
@@ -106,76 +107,73 @@ export function Admin() {
 
   const { mutateAsync: handleRoleChange } = useMutation({
     mutationFn: async ({ username, role }: { username: string, role: Role }) => {
-      try {
-        await client.api.v1.users[":username"].$patch({
-          json: { role },
-          param: { username }
-        })
-      }
-      catch {
-        throw new Error("Cannot connect to server")
-      }
+      const response = await client.api.v1.users[":username"].$patch({
+        json: { role },
+        param: { username }
+      })
+      if (!response.ok) throw new Error("Failed to update role")
     },
-    onSuccess: () => {
+    onMutate: async ({ username, role }: { username: string, role: Role }) => {
+      await queryClient.cancelQueries(({ queryKey: [queryKey] }))
+      const previous = queryClient.getQueryData([queryKey])
+      queryClient.setQueryData([queryKey], (old: User[]) =>
+        old.map((u) => u.username === username ? { ...u, role } : u)
+      )
+
+      console.log(queryClient.getQueryData([queryKey]))
+
+      return { previous }
+    },
+    onSettled: () => {
       queryClient.invalidateQueries({
         queryKey: [queryKey]
       });
     },
-    onError: () => {
-      // TODO: error
+    onError: (_err, _vars, context) => {
+      queryClient.setQueryData([queryKey], context?.previous)
     }
   })
 
   const { mutateAsync: handleDelete } = useMutation({
     mutationFn: async ({ username }: { username: string }) => {
-      try {
-        await client.api.v1.users[":username"].$delete({
-          param: { username }
-        })
-      }
-      catch {
-        throw new Error("Cannot connect to server")
-      }
+      const response = await client.api.v1.users[":username"].$delete({
+        param: { username }
+      })
+      if (!response.ok) throw new Error("Failed to delete user")
     },
-    onSuccess: () => {
-      queryClient.invalidateQueries({
-        queryKey: [queryKey]
-      });
+    onMutate: async ({ username }: { username: string }) => {
+      await queryClient.cancelQueries({ queryKey: [queryKey] })
+      const previous = queryClient.getQueryData([queryKey])
+      queryClient.setQueryData([queryKey], (old: User[]) =>
+        old.filter((u) => u.username !== username)
+      )
+      return { previous }
     },
-    onError: () => {
-      // TODO: error
+    onSettled: () => queryClient.invalidateQueries({ queryKey: [queryKey] }),
+    onError: (_err, _vars, context) => {
+      queryClient.setQueryData([queryKey], context?.previous)
     }
   })
 
   const { mutateAsync: createUser } = useMutation({
     mutationFn: async ({ username, password }: { username: string, password: string }) => {
-      let response;
-      try {
-        response = await client.api.v1.users.$post({
-          json: {
-            username,
-            password
-          }
-        })
-      }
-      catch {
-        throw new Error("Cannot connect to server")
-      }
+      const response = await client.api.v1.users.$post({
+        json: {
+          username,
+          password
+        }
+      })
       if (!response.ok) {
         const body = await response.json()
         throw new Error(body.message)
       }
     },
-    onSuccess: () => {
+    onMutate: () => {
       setModalOpen(false)
-      setUsername("")
-      setPassword("")
-      queryClient.invalidateQueries({
-        queryKey: [queryKey]
-      });
     },
+    onSettled: () => queryClient.invalidateQueries({ queryKey: [queryKey] }),
     onError: (error) => {
-      // TODO: error
+      setModalOpen(true)
       console.log(error)
     }
   })
@@ -221,7 +219,11 @@ export function Admin() {
               Manage accounts, roles, and permissions
             </p>
           </div>
-          <Button size="sm" className="gap-1.5" onClick={() => setModalOpen(true)}>
+          <Button size="sm" className="gap-1.5" onClick={() => {
+            setModalOpen(true)
+            setUsername("")
+            setPassword("")
+          }}>
             <Plus className="h-4 w-4" />
             Add User
           </Button>

@@ -61,46 +61,48 @@ export function Messages() {
 
   const { mutateAsync: editMessage } = useMutation({
     mutationFn: async ({ id, message }: { id: string, message: string }) => {
-      try {
-        await client.api.v1.messages[":id"].$patch(
-          {
-            json: { message },
-            param: { id }
-          }
-        )
-      }
-      catch {
-        throw new Error("Cannot connect to server")
-      }
+      const response = await client.api.v1.messages[":id"].$patch(
+        {
+          json: { message },
+          param: { id }
+        }
+      )
+      if (!response.ok) throw new Error("Failed to edit message")
     },
-    onSuccess: () => {
-      queryClient.invalidateQueries({
-        queryKey: [queryKey]
-      });
+    onMutate: async ({ id, message }: { id: string, message: string }) => {
+      await queryClient.cancelQueries({ queryKey: [queryKey] })
+      const previous = queryClient.getQueryData([queryKey])
+      queryClient.setQueryData([queryKey], (old: Message[]) =>
+        old.map((msg) => msg.id === id ? { ...msg, content: message } : msg)
+      )
+      return { previous }
     },
-    onError: () => {
-      // TODO: 
+    onSettled: () => queryClient.invalidateQueries({ queryKey: [queryKey], refetchType: 'none' }),
+    onError: (_err, _vars, context) => {
+      queryClient.setQueryData([queryKey], context?.previous)
     }
   })
 
   const { mutateAsync: deleteMessage } = useMutation({
     mutationFn: async ({ id }: { id: string }) => {
-      try {
-        await client.api.v1.messages[":id"].$delete({
-          param: { id }
-        })
-      }
-      catch {
-        throw new Error("Cannot connect to server")
+      const response = await client.api.v1.messages[":id"].$delete({
+        param: { id }
+      })
+      if (!response.ok) {
+        throw new Error("Failed to delete message")
       }
     },
-    onSuccess: () => {
-      queryClient.invalidateQueries({
-        queryKey: [queryKey]
-      });
+    onMutate: async ({ id }: { id: string }) => {
+      await queryClient.cancelQueries({ queryKey: [queryKey] })
+      const previous = queryClient.getQueryData([queryKey])
+      queryClient.setQueryData([queryKey], (old: Message[]) =>
+        old.filter((msg) => msg.id !== id)
+      )
+      return { previous }
     },
-    onError: () => {
-      // TODO: 
+    onSettled: () => queryClient.invalidateQueries({ queryKey: [queryKey], refetchType: 'none' }),
+    onError: (_err, _vars, context) => {
+      queryClient.setQueryData([queryKey], context?.previous)
     }
   })
 
@@ -139,9 +141,9 @@ export function Messages() {
   if (!user || isLoading) return "Logging in...";
 
   return (
-    <div className="min-h-[calc(100vh-4rem)] flex flex-col bg-slate-50 dark:bg-slate-950">
+    <div className="min-h-[calc(100vh-4rem)] flex flex-col bg-slate-50 dark:bg-slate-950 relative">
       {/* Messages */}
-      <div className="flex-1 overflow-y-auto px-4 py-6 space-y-3 max-w-4xl mx-auto w-full">
+      <div className="flex-1 overflow-y-auto px-4 py-6 space-y-3 max-w-4xl mx-auto w-full pr-24">
         {
           messagesError ? (
             <div className="flex flex-col items-center justify-center mt-20 gap-3">
@@ -173,7 +175,7 @@ export function Messages() {
                       </p>
                       <div className="flex items-center gap-1">
                         <p className="text-gray-400 dark:text-gray-500 text-xs mr-2">
-                          {new Date(msg.createdAt).toLocaleTimeString([], { hour: "2-digit", minute: "2-digit" })}
+                          {new Date(msg.createdAt).toLocaleString([], { year: "numeric", month: "short", day: "numeric", hour: "2-digit", minute: "2-digit" })}
                         </p>
                         {
                           msg.username === user.username ? (
@@ -207,7 +209,7 @@ export function Messages() {
       </div>
 
       {/* Floating plus button */}
-      <div className="flex justify-center pb-6">
+      <div className="absolute top-[1rem] right-6">
         <Button
           onClick={openNew}
           className="rounded-full h-14 w-14 bg-gray-900 dark:bg-white text-white dark:text-gray-900 hover:bg-gray-700 dark:hover:bg-gray-200 shadow-xl hover:scale-110 active:scale-95 transition-all"
