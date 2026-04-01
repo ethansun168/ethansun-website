@@ -6,7 +6,7 @@ export function NotFound() {
   const navigate = useNavigate();
 
   return (
-    <div className="flex items-center justify-center min-h-screen bg-gray-50 dark:bg-gray-900 px-4">
+    <div className="min-h-[calc(100vh-4rem)] flex items-center justify-center bg-gray-50 dark:bg-gray-900 px-4">
       <Card className="max-w-md text-center shadow-lg bg-white dark:bg-gray-800">
         <CardContent className="py-12 px-6">
           <h1 className="text-5xl font-bold text-gray-800 dark:text-gray-100 mb-4">404 Not Found</h1>

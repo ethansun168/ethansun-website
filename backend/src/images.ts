@@ -4,7 +4,7 @@
 import { Hono } from "hono";
 import { AwsClient } from "aws4fetch";
 import { AppEnv } from "./types.js";
-import { requireAuth } from "./middleware.js";
+import { requireRole } from "./middleware.js";
 import { createImage, deleteImage, editImage, getImages } from "../db/images.js";
 import { bodyLimit } from "hono/body-limit";
 import { zValidator } from "@hono/zod-validator";
@@ -28,7 +28,7 @@ function getUrl(env: AppEnv['Bindings'], key: string) {
 
 // TODO: may have to cache the signed urls
 const app = new Hono<AppEnv>()
-  .get("/api/v1/images", async (c) => {
+  .get("/api/v1/images", requireRole("baby"), async (c) => {
     const aws = getClient(c.env);
     const res = await aws.fetch(getUrl(c.env, ""), {
       method: "GET",
@@ -62,7 +62,7 @@ const app = new Hono<AppEnv>()
   })
 
   .post("/api/v1/images",
-    requireAuth,
+    requireRole("baby"),
     zValidator('form',
       z.object({
         file: z.instanceof(File)
@@ -99,7 +99,7 @@ const app = new Hono<AppEnv>()
       return c.json({ key, url })
     })
   .patch("/api/v1/images/:id",
-    requireAuth,
+    requireRole("baby"),
     zValidator('json',
       z.object({
         name: z.string()
@@ -113,7 +113,7 @@ const app = new Hono<AppEnv>()
       }
       return c.json({ "message": "Image update failed" }, 404)
     })
-  .delete("/api/v1/images/:id", requireAuth, async (c) => {
+  .delete("/api/v1/images/:id", requireRole("baby"), async (c) => {
     const id = c.req.param("id");
 
     if (!deleteImage(c.get('db'), id, c.get('username'))) {

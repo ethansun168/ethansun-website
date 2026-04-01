@@ -1,22 +1,22 @@
-import type { UserItem } from "@/app";
-import cursorPlus from "@/assets/cursor-plus.svg";
-import cursorPlusDark from "@/assets/cursor-plus-dark.png";
-import redPikmin from "@/assets/red-pikmin.png";
 import bluePikmin from "@/assets/blue-pikmin.png";
-import yellowPikmin from "@/assets/yellow-pikmin.png";
+import cursorPlusDark from "@/assets/cursor-plus-dark.png";
+import cursorPlus from "@/assets/cursor-plus.svg";
 import pinkPikmin from "@/assets/pink-pikmin.png";
+import redPikmin from "@/assets/red-pikmin.png";
 import rockPikmin from "@/assets/rock-pikmin.png";
+import yellowPikmin from "@/assets/yellow-pikmin.png";
 import { Button } from "@/components/ui/button";
 import { Card, CardContent, CardFooter, CardHeader, CardTitle } from "@/components/ui/card";
-import { useState } from "react";
-import { useNavigate } from "react-router-dom";
 import {
   DropdownMenu,
   DropdownMenuContent,
   DropdownMenuItem,
   DropdownMenuTrigger,
-} from "@/components/ui/dropdown-menu"
+} from "@/components/ui/dropdown-menu";
+import { useGame } from "@/context/GameContext";
 import { MoreVertical } from "lucide-react";
+import { useState } from "react";
+import { useNavigate } from "react-router-dom";
 
 type Product = {
   id: number;
@@ -36,14 +36,9 @@ const products: Product[] = [
   { id: 6, name: "Rock Pikmin", price: 100, sellPrice: 7, image: rockPikmin, darkImage: rockPikmin },
 ];
 
-interface ShopProps {
-  points: number;
-  setPoints: React.Dispatch<React.SetStateAction<number>>;
-  items: UserItem[],
-  setItems: React.Dispatch<React.SetStateAction<UserItem[]>>;
-}
+export function Shop() {
 
-export function Shop({ points, setPoints, items, setItems }: ShopProps) {
+  const { points, setPoints, items, setItems } = useGame()
   const [error, setError] = useState<string | null>(null);
   const navigate = useNavigate();
 
@@ -140,8 +135,8 @@ export function Shop({ points, setPoints, items, setItems }: ShopProps) {
                 onClick={() => handleBuy(product)}
                 disabled={points < product.price}
                 className={`w-full font-semibold ${points < product.price
-                    ? "bg-gray-400 text-gray-800 dark:bg-gray-600 dark:text-gray-300 cursor-not-allowed"
-                    : "bg-blue-600 hover:bg-blue-500 text-white"
+                  ? "bg-gray-400 text-gray-800 dark:bg-gray-600 dark:text-gray-300 cursor-not-allowed"
+                  : "bg-blue-600 hover:bg-blue-500 text-white"
                   }`}
               >
                 {points < product.price ? "Too Expensive" : "Buy"}

@@ -2,16 +2,16 @@ import { Hono } from "hono";
 import { createMessage, deleteMessage, editMessage, getMessages } from "../db/messages.js";
 import { zValidator } from "@hono/zod-validator";
 import z from "zod";
-import { requireAuth } from "./middleware.js";
+import { requireRole } from "./middleware.js";
 import { AppEnv } from "./types.js";
 
 const app = new Hono<AppEnv>()
-  .get('/api/v1/messages', requireAuth, async (c) => {
+  .get('/api/v1/messages', requireRole("baby"), async (c) => {
     const messages = await getMessages(c.get('db'));
     return c.json(messages)
   })
   .post('/api/v1/messages',
-    requireAuth,
+    requireRole("baby"),
     zValidator(
       'json',
       z.object({
@@ -26,7 +26,7 @@ const app = new Hono<AppEnv>()
       return c.json({ "message": "Message created" })
     })
   .patch('/api/v1/messages/:id',
-    requireAuth,
+    requireRole("baby"),
     zValidator(
       'json',
       z.object({
@@ -44,7 +44,7 @@ const app = new Hono<AppEnv>()
       return c.json({ "message": "Message update failed" }, 404)
     })
   .delete('/api/v1/messages/:id',
-    requireAuth,
+    requireRole("baby"),
     async (c) => {
       // Delete message
       const username = c.get("username")

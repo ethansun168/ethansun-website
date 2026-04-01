@@ -1,18 +1,18 @@
 import { zValidator } from "@hono/zod-validator";
 import { Hono } from "hono";
 import z from "zod";
+import { RoleArray } from "./types.js";
 import { createUser, deleteUser, editUserRole, getUsers } from "../db/users.js";
-import { ROLES } from "../db/schema.js";
-import { isAdmin } from "./middleware.js";
+import { requireRole } from "./middleware.js";
 import { AppEnv } from "./types.js";
 
 const app = new Hono<AppEnv>()
-  .get("/api/v1/users", isAdmin, async (c) => {
+  .get("/api/v1/users", requireRole("admin"), async (c) => {
     const users = await getUsers(c.get('db'))
     return c.json(users)
   })
   .post("/api/v1/users",
-    isAdmin,
+    requireRole("admin"),
     zValidator(
       'json',
       z.object({
@@ -30,11 +30,11 @@ const app = new Hono<AppEnv>()
     }
   )
   .patch("/api/v1/users/:username",
-    isAdmin,
+    requireRole("admin"),
     zValidator(
       'json',
       z.object({
-        role: z.enum(ROLES)
+        role: z.enum(RoleArray)
       })
     ),
     async (c) => {
@@ -52,7 +52,7 @@ const app = new Hono<AppEnv>()
 
       return c.json({ "message": "User update failed" }, 404)
     })
-  .delete("/api/v1/users/:username", isAdmin, async (c) => {
+  .delete("/api/v1/users/:username", requireRole("admin"), async (c) => {
     // Cannot delete own user
     const reqUser = c.get('username')
     const username = c.req.param('username')

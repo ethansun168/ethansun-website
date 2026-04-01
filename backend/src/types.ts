@@ -18,3 +18,17 @@ export type AppEnv = {
   Bindings: Bindings;
   Variables: Variables
 }
+
+export type CookiePayload = {
+  username: string,
+  role: RoleType
+}
+
+export const ROLES = {
+  user: 1,
+  baby: 2,
+  admin: 3,
+}
+
+export type RoleType = keyof typeof ROLES;
+export const RoleArray = Object.keys(ROLES) as [RoleType, ...RoleType[]]

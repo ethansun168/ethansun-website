@@ -7,26 +7,15 @@ import {
   DropdownMenuTrigger,
 } from "@/components/ui/dropdown-menu";
 import { Sheet, SheetClose, SheetContent, SheetDescription, SheetHeader, SheetTitle, SheetTrigger } from '@/components/ui/sheet';
-import { client } from "@/constants";
+import { client, ROUTES } from "@/constants";
 import { useUser } from "@/hooks/query";
 import { useQueryClient } from "@tanstack/react-query";
 import { useEffect, useState } from "react";
 import { Link, useNavigate } from "react-router-dom";
 import { ModeToggle } from "./mode-toggle";
 
-const navLinks = [
-  { name: 'Home', to: '/' },
-  { name: 'Game', to: '/game' },
-  { name: 'Command Line', to: '/command' },
-  { name: 'About', to: '/about' },
-  { name: 'Contact', to: '/contact' },
-];
-
-const dropdownLinks = [
-  { name: 'Messages', to: '/messages' },
-  { name: 'Gallery', to: '/Gallery' },
-  // { name: 'Dashboard', to: '/dashboard' },
-]
+const navLinks = ROUTES.filter(r => r.nav).map(r => ({ name: r.nav!, to: r.path }))
+const dropdownLinks = ROUTES.filter(r => r.dropdown).map(r => ({ name: r.dropdown!, to: r.path }))
 
 export default function Navbar() {
   const [hidden, setHidden] = useState(false);

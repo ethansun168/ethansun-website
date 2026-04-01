@@ -4,8 +4,8 @@ import { Hono } from "hono";
 import { deleteCookie, setSignedCookie } from "hono/cookie";
 import z from "zod";
 import { getUser } from "../db/users.js";
-import { AUTH_COOKIE_NAME, requireAuth } from "./middleware.js";
-import { AppEnv } from "./types.js";
+import { AUTH_COOKIE_NAME, requireRole } from "./middleware.js";
+import { AppEnv, CookiePayload } from "./types.js";
 
 const SALT_ROUNDS = 5;
 export async function hashPassword(plainPassword: string) {
@@ -18,7 +18,6 @@ export async function verifyPassword(plainPassword: string, hashedPassword: stri
   const match = await bcrypt.compare(plainPassword, hashedPassword);
   return match;
 }
-
 
 const app = new Hono<AppEnv>()
   .post(
@@ -36,7 +35,12 @@ const app = new Hono<AppEnv>()
         return c.json({ "message": "Invalid credentials" }, 401);
       }
 
-      await setSignedCookie(c, AUTH_COOKIE_NAME, username, c.env.COOKIE_SECRET, {
+      const cookiePayload: CookiePayload = {
+        username: user.username,
+        role: user.role
+      }
+
+      await setSignedCookie(c, AUTH_COOKIE_NAME, JSON.stringify(cookiePayload), c.env.COOKIE_SECRET, {
         httpOnly: true,
         secure: true,
         sameSite: 'none',
@@ -47,7 +51,7 @@ const app = new Hono<AppEnv>()
       const { password: pw, ...safeUser } = user;
       return c.json(safeUser);
     })
-  .get('/api/v1/me', requireAuth, async (c) => {
+  .get('/api/v1/me', requireRole("user"), async (c) => {
     const username = c.get('username');
     const user = await getUser(c.get('db'), username);
     if (!user) {
@@ -57,7 +61,7 @@ const app = new Hono<AppEnv>()
     const { password: pw, ...safeUser } = user;
     return c.json(safeUser);
   })
-  .get('/api/v1/logout', requireAuth, async (c) => {
+  .get('/api/v1/logout', requireRole("user"), async (c) => {
     deleteCookie(c, AUTH_COOKIE_NAME, {
       httpOnly: true,
       secure: true,

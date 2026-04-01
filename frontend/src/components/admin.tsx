@@ -33,7 +33,8 @@ import {
 import { client } from "@/constants";
 import { useRequireAuth } from "@/hooks/auth";
 import { useMutation, useQuery, useQueryClient } from "@tanstack/react-query";
-import { ROLES } from "ethansun-website-backend/dist/db/schema";
+import type { RoleType } from "ethansun-website-backend/dist/src/types";
+import { RoleArray } from "ethansun-website-backend/dist/src/types";
 import {
   ArrowDown,
   ArrowUp,
@@ -55,7 +56,7 @@ function formatDate(date: Date): string {
 export function Admin() {
   const { user, isLoading } = useRequireAuth();
   const [search, setSearch] = useState("");
-  const [roleFilter, setRoleFilter] = useState<Role | "all">("all");
+  const [roleFilter, setRoleFilter] = useState<RoleType | "all">("all");
   const [sortField, setSortField] = useState<SortField>("createdAt");
   const [sortDir, setSortDir] = useState<SortDir>("desc");
   const [username, setUsername] = useState('');
@@ -74,12 +75,12 @@ export function Admin() {
     enabled: user?.role === 'admin'
   })
 
-  type Role = typeof ROLES[number]
+  // type Role = typeof ROLES[number]
   type User = NonNullable<typeof user>
   type SortField = keyof NonNullable<NonNullable<typeof users>[number]>
   type SortDir = "asc" | "desc";
 
-  const ROLE_CONFIG: Record<Role, { label: string; variant: "default" | "secondary" | "destructive" | "outline"; className: string }> = {
+  const ROLE_CONFIG: Record<RoleType, { label: string; variant: "default" | "secondary" | "destructive" | "outline"; className: string }> = {
     admin: {
       label: "Admin",
       variant: "default",
@@ -90,6 +91,11 @@ export function Admin() {
       variant: "outline",
       className: "bg-sky-500/15 text-sky-600 border-sky-200 hover:bg-sky-500/20 dark:text-sky-400 dark:border-sky-800",
     },
+    baby: {
+      label: "Baby",
+      variant: "default",
+      className: "bg-pink-500/15 text-pink-600 border-pink-200 hover:bg-pink-500/20 dark:text-pink-300 dark:border-pink-700"
+    }
   };
 
   const handleSort = (field: SortField) => {
@@ -102,14 +108,14 @@ export function Admin() {
   };
 
   const { mutateAsync: handleRoleChange } = useMutation({
-    mutationFn: async ({ username, role }: { username: string, role: Role }) => {
+    mutationFn: async ({ username, role }: { username: string, role: RoleType }) => {
       const response = await client.api.v1.users[":username"].$patch({
         json: { role },
         param: { username }
       })
       if (!response.ok) throw new Error("Failed to update role")
     },
-    onMutate: async ({ username, role }: { username: string, role: Role }) => {
+    onMutate: async ({ username, role }: { username: string, role: RoleType }) => {
       await queryClient.cancelQueries(({ queryKey: [queryKey] }))
       const previous = queryClient.getQueryData([queryKey])
       queryClient.setQueryData([queryKey], (old: User[]) =>
@@ -242,7 +248,7 @@ export function Admin() {
                 <Filter className="h-4 w-4 text-slate-400 shrink-0" />
                 <Select
                   value={roleFilter}
-                  onValueChange={(v) => setRoleFilter(v as Role | "all")}
+                  onValueChange={(v) => setRoleFilter(v as RoleType | "all")}
                 >
                   <SelectTrigger className="w-36 h-9 bg-white dark:bg-slate-900 border-slate-200 dark:border-slate-700">
                     <SelectValue placeholder="Filter role" />
@@ -250,7 +256,7 @@ export function Admin() {
                   <SelectContent>
                     <SelectItem value="all">All Roles</SelectItem>
                     {
-                      ROLES.map((role) => (
+                      (RoleArray).map((role) => (
                         <SelectItem key={role} value={role}>{role.charAt(0).toUpperCase() + role.slice(1)}</SelectItem>
                       ))
                     }
@@ -340,7 +346,7 @@ export function Admin() {
                                 u.username !== user.username ? (
                                   <>
                                     <DropdownMenuLabel className="text-xs text-slate-500">Change Role</DropdownMenuLabel>
-                                    {ROLES.map((r) => (
+                                    {(RoleArray).map((r) => (
                                       <DropdownMenuItem
                                         key={r}
                                         onClick={() => handleRoleChange({ username: u.username, role: r })}

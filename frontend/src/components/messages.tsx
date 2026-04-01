@@ -12,11 +12,13 @@ import { Card, CardContent } from "./ui/card";
 import { client } from "@/constants";
 import { useMutation, useQuery, useQueryClient } from "@tanstack/react-query";
 import { useRequireAuth } from "@/hooks/auth";
+import { Forbidden } from "./forbidden";
 
 export function Messages() {
   const { user, isLoading } = useRequireAuth();
   const [modalOpen, setModalOpen] = useState(false);
   const [modalText, setModalText] = useState("");
+  const [forbidden, setForbidden] = useState(false)
 
   const queryClient = useQueryClient();
   const queryKey = "messages";
@@ -25,9 +27,15 @@ export function Messages() {
     queryKey: [queryKey],
     queryFn: async () => {
       const resp = await client.api.v1.messages.$get()
+      if (resp.status == 403) {
+        setForbidden(true)
+        return
+      }
       if (!resp.ok) throw new Error("Error occurred");
+
       return await resp.json();
     },
+    refetchOnWindowFocus: false
   })
 
   type Message = NonNullable<typeof messages>[number];
@@ -138,6 +146,9 @@ export function Messages() {
   };
 
   if (!user || isLoading) return "Logging in...";
+  if (forbidden) {
+    return <Forbidden />
+  }
 
   return (
     <div className="min-h-[calc(100vh-4rem)] flex flex-col bg-slate-50 dark:bg-slate-950 relative">

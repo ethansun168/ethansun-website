@@ -11,18 +11,30 @@ import { useRequireAuth } from "@/hooks/auth";
 import { useMutation, useQuery, useQueryClient } from "@tanstack/react-query";
 import { ImageIcon, Plus, Trash2, X, Upload, CheckCircle2, Pencil } from "lucide-react";
 import { useState, useRef, useCallback } from "react";
+import { Forbidden } from "./forbidden";
 
 export function Gallery() {
   const { user, isLoading } = useRequireAuth()
   const queryKey = "images"
   const queryClient = useQueryClient()
-  const { data: serverImages } = useQuery({
+  const { data: serverImages,
+    isLoading: imagesLoading,
+    isError: imagesError,
+    refetch: refetchImages,
+    dataUpdatedAt: imagesUpdatedAt
+  } = useQuery({
     queryKey: [queryKey],
     queryFn: async () => {
       const response = await client.api.v1.images.$get()
+      if (response.status == 403) {
+        setForbidden(true)
+        return
+      }
       if (!response.ok) throw new Error("Failed to fetch images")
       return await response.json()
     },
+    staleTime: 1000 * 60 * 5, // 5 min
+    refetchOnWindowFocus: false
   })
 
   type Image = NonNullable<typeof serverImages>[number] & { status: "uploading" | "done" | "error" }
@@ -32,6 +44,7 @@ export function Gallery() {
   const [dragging, setDragging] = useState(false)
   const [pendingFiles, setPendingFiles] = useState<File[]>([])
   const [previewImage, setPreviewImage] = useState<Image | null>(null)
+  const [forbidden, setForbidden] = useState(false)
 
   const [imageEdit, setImageEdit] = useState<Image | null>(null)
   const [editName, setEditName] = useState("")
@@ -161,16 +174,40 @@ export function Gallery() {
     setModalOpen(true)
   }
 
+  if (forbidden) {
+    return <Forbidden />
+  }
+
   return (
-    <div className="min-h-[calc(100vh-4rem)] flex flex-col bg-slate-50 dark:bg-slate-950">
+    <div className="min-h-[calc(100vh-4rem)] flex flex-col bg-slate-50 dark:bg-slate-950 relative">
+      <div className="flex justify-center py-2">
+        <p className="text-gray-400 dark:text-gray-600 text-xs">
+          Last updated: {new Date(imagesUpdatedAt).toLocaleTimeString()}
+        </p>
+      </div>
       {/* Grid */}
       <div className="flex-1 overflow-y-auto px-4 py-6 max-w-4xl mx-auto w-full">
-        {images.length === 0 ? (
+        {imagesError ? (
+          <div className="flex flex-col items-center justify-center mt-20 gap-3">
+            <div className="h-10 w-10 rounded-full bg-red-100 dark:bg-red-900/20 flex items-center justify-center">
+              <X className="h-5 w-5 text-red-500" />
+            </div>
+            <p className="text-gray-900 dark:text-white text-sm font-medium">Failed to load images</p>
+            <Button size="sm" onClick={() => refetchImages()} className="bg-gray-900 dark:bg-white text-white dark:text-gray-900 hover:bg-gray-700 dark:hover:bg-gray-200 shadow-xl">
+              Try again
+            </Button>
+          </div>
+        ) : imagesLoading ? (
+          <div className="flex flex-col items-center justify-center mt-20 gap-3">
+            <div className="h-8 w-8 rounded-full border-2 border-gray-200 dark:border-gray-700 border-t-gray-900 dark:border-t-white animate-spin" />
+            <p className="text-gray-400 dark:text-gray-600 text-sm">Loading images...</p>
+          </div>
+        ) : images.length === 0 ? (
           <div className="text-center text-gray-400 dark:text-gray-600 mt-20 text-sm">
             No images yet. Upload something!
           </div>
         ) : (
-          <div className="grid grid-cols-2 sm:grid-cols-3 gap-3">
+          <div className="grid grid-cols-2 sm:grid-cols-3 gap-3 pt-8">
             {images.map((img) => (
               <Card
                 key={img.id}
@@ -256,7 +293,7 @@ export function Gallery() {
       </div>
 
       {/* Floating plus button */}
-      <div className="flex justify-center pb-6">
+      <div className="absolute top-[1rem] right-6">
         <Button
           onClick={openNew}
           className="rounded-full h-14 w-14 bg-gray-900 dark:bg-white text-white dark:text-gray-900 hover:bg-gray-700 dark:hover:bg-gray-200 shadow-xl hover:scale-110 active:scale-95 transition-all"

@@ -1,25 +1,19 @@
-import type { UserItem } from "@/app";
 import { Button } from "@/components/ui/button";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import {
-    Sheet,
-    SheetContent,
-    SheetHeader,
-    SheetTitle
+  Sheet,
+  SheetContent,
+  SheetHeader,
+  SheetTitle
 } from "@/components/ui/sheet";
+import { useGame } from "@/context/GameContext";
 import { Settings } from "lucide-react";
 import { useState } from "react";
 import { useNavigate } from "react-router-dom";
 import { Input } from "../ui/input";
 
-interface GameProps {
-  points: number;
-  setPoints: React.Dispatch<React.SetStateAction<number>>;
-  items: UserItem[]
-  setItems: React.Dispatch<React.SetStateAction<UserItem[]>>;
-}
-
-export function Game({ points, setPoints, setItems, items }: GameProps) {
+export function Game() {
+  const { points, setPoints, items, setItems } = useGame()
   const navigate = useNavigate();
   const [gambleInput, setGambleInput] = useState("");
   const [gambleOutput, setGambleOutput] = useState("");
