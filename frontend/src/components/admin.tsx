@@ -67,13 +67,9 @@ export function Admin() {
   const { data: users } = useQuery({
     queryKey: [queryKey],
     queryFn: async () => {
-      try {
-        const response = await client.api.v1.users.$get();
-        return await response.json()
-      }
-      catch {
-        throw new Error("Cannot connect to server")
-      }
+      const response = await client.api.v1.users.$get();
+      if (!response.ok) throw new Error("Failed to get user")
+      return await response.json()
     },
     enabled: user?.role === 'admin'
   })

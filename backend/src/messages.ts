@@ -1,5 +1,5 @@
 import { Hono } from "hono";
-import { createMessage, deleteMessage, editMessage, getMessages } from "../db/db.js";
+import { createMessage, deleteMessage, editMessage, getMessages } from "../db/messages.js";
 import { zValidator } from "@hono/zod-validator";
 import z from "zod";
 import { requireAuth } from "./middleware.js";

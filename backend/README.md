@@ -39,3 +39,17 @@ npm install
 # Run dev server
 npm run dev
 ```
+
+## Environment Variables
+
+For local development, secret environment variables go in `.dev.vars`
+
+Public environment variables go in `wrangler.jsonc` in the `vars` field
+
+For production, push environment variables to Cloudflare by
+
+```
+npx wrangler secret bulk .dev.vars
+```
+
+Update the `Bindings` type in `types.ts` to reflect all private and public environment variables

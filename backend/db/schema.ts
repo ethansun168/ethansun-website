@@ -16,3 +16,11 @@ export const messages = sqliteTable("messages", {
   content: text("content").notNull(),
   createdAt: integer("created", { mode: "timestamp" }).notNull().default(sql`(unixepoch())`),
 })
+
+export const images = sqliteTable("images", {
+  id: text("id").primaryKey(),
+  name: text("name").notNull(),
+  url: text("url").notNull(),
+  username: text("username").notNull().references(() => users.username, { onDelete: "cascade" }),
+  createdAt: integer("created", { mode: "timestamp" }).notNull().default(sql`(unixepoch())`),
+})

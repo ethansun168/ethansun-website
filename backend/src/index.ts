@@ -4,6 +4,7 @@ import { logger } from 'hono/logger';
 import auth from './auth.js';
 import messages from './messages.js';
 import users from './users.js';
+import images from './images.js';
 import { createDb } from '../db/db.js';
 import { AppEnv } from './types.js';
 
@@ -33,6 +34,7 @@ const route = app.get('/api/v1', (c) => {
   .route('/', auth)
   .route('/', users)
   .route('/', messages)
+  .route('/', images)
 
 export default app;
 

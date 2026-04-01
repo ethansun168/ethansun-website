@@ -3,7 +3,7 @@ import bcrypt from "bcryptjs";
 import { Hono } from "hono";
 import { deleteCookie, setSignedCookie } from "hono/cookie";
 import z from "zod";
-import { getUser } from "../db/db.js";
+import { getUser } from "../db/users.js";
 import { AUTH_COOKIE_NAME, requireAuth } from "./middleware.js";
 import { AppEnv } from "./types.js";
 

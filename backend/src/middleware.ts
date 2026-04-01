@@ -1,7 +1,7 @@
 import { getSignedCookie } from "hono/cookie";
 import { createMiddleware } from "hono/factory";
 import { AppEnv } from "./types.js";
-import { getUser } from "../db/db.js";
+import { getUser } from "../db/users.js";
 
 export const AUTH_COOKIE_NAME = 'authCookie';
 

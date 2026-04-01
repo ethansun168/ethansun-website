@@ -1,7 +1,7 @@
 import { zValidator } from "@hono/zod-validator";
 import { Hono } from "hono";
 import z from "zod";
-import { createUser, deleteUser, editUserRole, getUsers } from "../db/db.js";
+import { createUser, deleteUser, editUserRole, getUsers } from "../db/users.js";
 import { ROLES } from "../db/schema.js";
 import { isAdmin } from "./middleware.js";
 import { AppEnv } from "./types.js";

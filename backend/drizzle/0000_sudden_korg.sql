@@ -1,3 +1,12 @@
+CREATE TABLE `images` (
+	`id` text PRIMARY KEY NOT NULL,
+	`name` text NOT NULL,
+	`url` text NOT NULL,
+	`username` text NOT NULL,
+	`created` integer DEFAULT (unixepoch()) NOT NULL,
+	FOREIGN KEY (`username`) REFERENCES `users`(`username`) ON UPDATE no action ON DELETE cascade
+);
+--> statement-breakpoint
 CREATE TABLE `messages` (
 	`id` text PRIMARY KEY NOT NULL,
 	`username` text NOT NULL,

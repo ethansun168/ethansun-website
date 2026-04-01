@@ -24,6 +24,7 @@ const navLinks = [
 
 const dropdownLinks = [
   { name: 'Messages', to: '/messages' },
+  { name: 'Gallery', to: '/Gallery' },
   // { name: 'Dashboard', to: '/dashboard' },
 ]
 

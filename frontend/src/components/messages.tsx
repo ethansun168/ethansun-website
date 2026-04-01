@@ -28,7 +28,6 @@ export function Messages() {
       if (!resp.ok) throw new Error("Error occurred");
       return await resp.json();
     },
-    initialData: []
   })
 
   type Message = NonNullable<typeof messages>[number];
@@ -160,7 +159,7 @@ export function Messages() {
               <div className="h-8 w-8 rounded-full border-2 border-gray-200 dark:border-gray-700 border-t-gray-900 dark:border-t-white animate-spin" />
               <p className="text-gray-400 dark:text-gray-600 text-sm">Loading messages...</p>
             </div>
-          ) : messages.length === 0 ? (
+          ) : !messages || messages.length === 0 ? (
             <div className="text-center text-gray-400 dark:text-gray-600 mt-20 text-sm">
               No messages yet. Say something!
             </div>
