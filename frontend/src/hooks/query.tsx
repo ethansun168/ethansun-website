@@ -19,6 +19,12 @@ export function useUser() {
   })
 }
 
+export function useRequireUser() {
+  const { data: user } = useUser();
+  if (!user) throw new Error("useRequiredUser called without a user");
+  return { user }
+}
+
 type LoginData = InferResponseType<typeof client.api.v1.login.$post, 200>
 export function useLogin(
   onSuccess?: (data: LoginData) => void,

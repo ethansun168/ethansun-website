@@ -14,9 +14,6 @@ import { useEffect, useState } from "react";
 import { Link, useNavigate } from "react-router-dom";
 import { ModeToggle } from "./mode-toggle";
 
-const navLinks = ROUTES.filter(r => r.nav).map(r => ({ name: r.nav!, to: r.path }))
-const dropdownLinks = ROUTES.filter(r => r.dropdown).map(r => ({ name: r.dropdown!, to: r.path }))
-
 export default function Navbar() {
   const [hidden, setHidden] = useState(false);
 
@@ -35,6 +32,8 @@ export default function Navbar() {
   const queryClient = useQueryClient();
   const navigate = useNavigate();
   const { data: user } = useUser();
+  const navLinks = ROUTES.filter(r => r.nav).map(r => ({ name: r.nav!, to: user && r.to ? r.to(user.username) : r.path }))
+  const dropdownLinks = ROUTES.filter(r => r.dropdown).map(r => ({ name: r.dropdown!, to: user && r.to ? r.to(user.username) : r.path }))
   async function logout() {
     try {
       await client.api.v1.logout.$get();
@@ -90,16 +89,6 @@ export default function Navbar() {
                         {link.name}
                       </DropdownMenuItem>
                     ))
-                  }
-                  {
-                    user.role === 'admin' ? (
-                      <DropdownMenuItem
-                        className="cursor-pointer"
-                        onClick={() => navigate("/admin")}
-                      >
-                        Admin
-                      </DropdownMenuItem>
-                    ) : null
                   }
                   <DropdownMenuItem
                     className="cursor-pointer"

@@ -2,7 +2,7 @@ import { zValidator } from "@hono/zod-validator";
 import { Hono } from "hono";
 import z from "zod";
 import { RoleArray } from "./types.js";
-import { createUser, deleteUser, editUserRole, getUsers } from "../db/users.js";
+import { createUser, deleteUser, editUserRole, getUser, getUsers } from "../db/users.js";
 import { requireRole } from "./middleware.js";
 import { AppEnv } from "./types.js";
 
@@ -10,6 +10,14 @@ const app = new Hono<AppEnv>()
   .get("/api/v1/users", requireRole("admin"), async (c) => {
     const users = await getUsers(c.get('db'))
     return c.json(users)
+  })
+  .get("/api/v1/users/:username", requireRole("user"), async (c) => {
+    const user = await getUser(c.get('db'), c.req.param('username'))
+    if (!user) {
+      return c.json({ message: "User not found" }, 404)
+    }
+    const { password, ...safeUser } = user
+    return c.json(safeUser)
   })
   .post("/api/v1/users",
     requireRole("admin"),

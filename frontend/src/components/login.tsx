@@ -1,9 +1,8 @@
 import { Button } from "@/components/ui/button";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { Input } from "@/components/ui/input";
-import { autoLoginPage } from "@/constants";
-import { useLogin, useUser } from "@/hooks/query";
-import { useEffect, useState } from "react";
+import { useLogin } from "@/hooks/query";
+import { useState } from "react";
 import { useNavigate } from "react-router-dom";
 
 export function Login() {
@@ -11,11 +10,10 @@ export function Login() {
   const [username, setUsername] = useState("");
   const [password, setPassword] = useState("");
   const [error, setError] = useState("");
-  const { data } = useUser();
   const { mutateAsync: loginRequest, isPending: loginPending } = useLogin(
     () => {
       setError('');
-      navigate(autoLoginPage, { replace: true });
+      navigate(`/user/${username}`, { replace: true });
     },
     (error) => {
       setError(String(error))
@@ -26,12 +24,6 @@ export function Login() {
     e.preventDefault();
     await loginRequest({ username, password });
   };
-
-  useEffect(() => {
-    if (data) {
-      navigate(autoLoginPage, { replace: true });
-    }
-  }, [data, navigate])
 
   return (
     <div className="flex min-h-[calc(100vh-4rem)] items-center justify-center bg-gray-50 dark:bg-gray-900 p-4 transition-colors duration-300">

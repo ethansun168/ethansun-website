@@ -7,14 +7,14 @@ import {
   DialogTitle,
 } from "@/components/ui/dialog";
 import { client } from "@/constants";
-import { useRequireAuth } from "@/hooks/auth";
 import { useMutation, useQuery, useQueryClient } from "@tanstack/react-query";
 import { ImageIcon, Plus, Trash2, X, Upload, CheckCircle2, Pencil } from "lucide-react";
 import { useState, useRef, useCallback } from "react";
 import { Forbidden } from "./forbidden";
+import { useRequireUser } from "@/hooks/query";
 
 export function Gallery() {
-  const { user, isLoading } = useRequireAuth()
+  const { user } = useRequireUser();
   const queryKey = "images"
   const queryClient = useQueryClient()
   const { data: serverImages,
@@ -134,8 +134,6 @@ export function Gallery() {
       queryClient.setQueryData([queryKey], context?.previous)
     }
   })
-
-  if (!user || isLoading) return "Logging in...";
 
   const handleUpload = async () => {
     if (!pendingFiles.length) return

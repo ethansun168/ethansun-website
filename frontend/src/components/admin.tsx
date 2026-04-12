@@ -30,8 +30,8 @@ import {
   TableHeader,
   TableRow,
 } from "@/components/ui/table";
-import { client } from "@/constants";
-import { useRequireAuth } from "@/hooks/auth";
+import { client, ROLE_CONFIG } from "@/constants";
+import { useRequireUser } from "@/hooks/query";
 import { useMutation, useQuery, useQueryClient } from "@tanstack/react-query";
 import type { RoleType } from "ethansun-website-backend/dist/src/types";
 import { RoleArray } from "ethansun-website-backend/dist/src/types";
@@ -48,13 +48,14 @@ import {
 import { useState } from "react";
 import { Forbidden } from "./forbidden";
 import { Dialog, DialogContent, DialogHeader, DialogTitle } from "./ui/dialog";
+import { useNavigate } from "react-router-dom";
 
 function formatDate(date: Date): string {
   return date.toLocaleDateString("en-US", { year: "numeric", month: "short", day: "numeric" });
 }
 
 export function Admin() {
-  const { user, isLoading } = useRequireAuth();
+  const { user } = useRequireUser();
   const [search, setSearch] = useState("");
   const [roleFilter, setRoleFilter] = useState<RoleType | "all">("all");
   const [sortField, setSortField] = useState<SortField>("createdAt");
@@ -62,6 +63,7 @@ export function Admin() {
   const [username, setUsername] = useState('');
   const [password, setPassword] = useState('');
   const [modalOpen, setModalOpen] = useState(false)
+  const navigate = useNavigate();
   const queryClient = useQueryClient();
 
   const queryKey = 'users'
@@ -75,28 +77,9 @@ export function Admin() {
     enabled: user?.role === 'admin'
   })
 
-  // type Role = typeof ROLES[number]
   type User = NonNullable<typeof user>
   type SortField = keyof NonNullable<NonNullable<typeof users>[number]>
   type SortDir = "asc" | "desc";
-
-  const ROLE_CONFIG: Record<RoleType, { label: string; variant: "default" | "secondary" | "destructive" | "outline"; className: string }> = {
-    admin: {
-      label: "Admin",
-      variant: "default",
-      className: "bg-rose-500/15 text-rose-600 border-rose-200 hover:bg-rose-500/20 dark:text-rose-400 dark:border-rose-800",
-    },
-    user: {
-      label: "User",
-      variant: "outline",
-      className: "bg-sky-500/15 text-sky-600 border-sky-200 hover:bg-sky-500/20 dark:text-sky-400 dark:border-sky-800",
-    },
-    baby: {
-      label: "Baby",
-      variant: "default",
-      className: "bg-pink-500/15 text-pink-600 border-pink-200 hover:bg-pink-500/20 dark:text-pink-300 dark:border-pink-700"
-    }
-  };
 
   const handleSort = (field: SortField) => {
     if (sortField === field) {
@@ -200,8 +183,6 @@ export function Admin() {
       ? <ArrowUp className="ml-1 h-3.5 w-3.5 text-primary" />
       : <ArrowDown className="ml-1 h-3.5 w-3.5 text-primary" />;
   };
-
-  if (!user || isLoading) return "Logging in...";
 
   if (user.role !== "admin") {
     return <Forbidden />
@@ -360,7 +341,7 @@ export function Admin() {
                                 ) : null
                               }
 
-                              <DropdownMenuItem>View Profile</DropdownMenuItem>
+                              <DropdownMenuItem onClick={() => navigate(`/user/${u.username}`)}>View Profile</DropdownMenuItem>
 
                               {
                                 u.username !== user.username ? (

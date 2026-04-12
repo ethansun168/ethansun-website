@@ -11,11 +11,11 @@ import { useState } from "react";
 import { Card, CardContent } from "./ui/card";
 import { client } from "@/constants";
 import { useMutation, useQuery, useQueryClient } from "@tanstack/react-query";
-import { useRequireAuth } from "@/hooks/auth";
 import { Forbidden } from "./forbidden";
+import { useRequireUser } from "@/hooks/query";
 
 export function Messages() {
-  const { user, isLoading } = useRequireAuth();
+  const { user } = useRequireUser();
   const [modalOpen, setModalOpen] = useState(false);
   const [modalText, setModalText] = useState("");
   const [forbidden, setForbidden] = useState(false)
@@ -145,7 +145,6 @@ export function Messages() {
     setModalOpen(false);
   };
 
-  if (!user || isLoading) return "Logging in...";
   if (forbidden) {
     return <Forbidden />
   }
